@@ -16,8 +16,12 @@ final class PhotoStore {
     var isBusy = false
     var errorMessage: String?
     var directory: URL
+    var isDragSelecting = false
 
     private var library: FolderPhotoLibrary
+    private var dragAnchorID: Photo.ID?
+    private var dragSnapshot: Set<Photo.ID> = []
+    private var dragDidMove = false
 
     var displayedPhotos: [Photo] {
         switch mode {
@@ -71,6 +75,45 @@ final class PhotoStore {
         } else {
             selectedIDs.insert(photo.id)
         }
+    }
+
+    func handleDragSelect(at photo: Photo) {
+        guard mode == .select else { return }
+        if dragAnchorID == nil {
+            dragAnchorID = photo.id
+            dragSnapshot = selectedIDs
+            dragDidMove = false
+            return
+        }
+        if photo.id != dragAnchorID {
+            dragDidMove = true
+            isDragSelecting = true
+        }
+        guard dragDidMove else { return }
+        applyDragRange(to: photo.id)
+    }
+
+    func endDragSelect() {
+        guard let anchorID = dragAnchorID else { return }
+        if !dragDidMove, let photo = displayedPhotos.first(where: { $0.id == anchorID }) {
+            toggle(photo)
+        }
+        dragAnchorID = nil
+        dragSnapshot = []
+        dragDidMove = false
+        isDragSelecting = false
+    }
+
+    private func applyDragRange(to currentID: Photo.ID) {
+        guard let anchorID = dragAnchorID,
+              let start = displayedPhotos.firstIndex(where: { $0.id == anchorID }),
+              let end = displayedPhotos.firstIndex(where: { $0.id == currentID })
+        else { return }
+        var next = dragSnapshot
+        for photo in displayedPhotos[min(start, end)...max(start, end)] {
+            next.insert(photo.id)
+        }
+        selectedIDs = next
     }
 
     func selectAll() {

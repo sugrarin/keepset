@@ -16,8 +16,14 @@ struct ContentView: View {
                     photos: store.displayedPhotos,
                     columns: store.columns,
                     selectedIDs: store.selectedIDs,
+                    isDragSelecting: store.isDragSelecting,
                     onToggle: store.toggle,
-                    onPreview: { previewPhoto = $0 }
+                    onPreview: { previewPhoto = $0 },
+                    onDragSelect: { photo in
+                        previewPhoto = nil
+                        store.handleDragSelect(at: photo)
+                    },
+                    onDragSelectEnd: store.endDragSelect
                 )
                 .opacity(store.photos.isEmpty ? 0 : 1)
 
