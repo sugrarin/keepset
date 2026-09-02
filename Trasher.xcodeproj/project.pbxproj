@@ -1,0 +1,359 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00C4976269ECB428E41AA637 /* TrasherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23DA7980607D4E6D62A774C /* TrasherApp.swift */; };
+		1C015A654167E1CAD74AB9C7 /* ThumbnailLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23D963FD2DB6C519207FF874 /* ThumbnailLoader.swift */; };
+		1E7A08677ACF28FD32B3D00F /* PreviewOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1575FD6AA4912541D925E091 /* PreviewOverlay.swift */; };
+		3429BEE1D51EA68249213548 /* photos in Resources */ = {isa = PBXBuildFile; fileRef = CE3DC101A5DAAAE96B665E5B /* photos */; };
+		4F49A059ECB157ECB7BE9350 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC5E38E06E09AB343DAC0472 /* Photo.swift */; };
+		55E42EFAFE133E77F38E5F0B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A71BBBE198CACF2F994E8E4F /* Assets.xcassets */; };
+		8DC3B9111B9538666038370B /* TopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE59FBD0256465D24D6101F /* TopBar.swift */; };
+		8EA4A701E85AE8B9D7E4EF54 /* PhotoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D9BE816459137979978F649 /* PhotoStore.swift */; };
+		969B5D61731626C6EDCC5C80 /* PhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331F86BFD71CB93AFC8C93FD /* PhotoLibrary.swift */; };
+		A71FC0463026B7305F2DDADC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB445A4AFD41C84F7046437 /* ContentView.swift */; };
+		C602CB5F8AFEE9ABFEE9CB02 /* PhotoGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C08F712864DAE1D2F010A2D /* PhotoGridView.swift */; };
+		FFEE1047F1341DFCD65639FB /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1A81A46ED04BD51FDA2804 /* PhotoCell.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1575FD6AA4912541D925E091 /* PreviewOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewOverlay.swift; sourceTree = "<group>"; };
+		1C08F712864DAE1D2F010A2D /* PhotoGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGridView.swift; sourceTree = "<group>"; };
+		23D963FD2DB6C519207FF874 /* ThumbnailLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailLoader.swift; sourceTree = "<group>"; };
+		331F86BFD71CB93AFC8C93FD /* PhotoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibrary.swift; sourceTree = "<group>"; };
+		4D9BE816459137979978F649 /* PhotoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoStore.swift; sourceTree = "<group>"; };
+		A37374321E8A4AA7FFE91644 /* Trasher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Trasher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A71BBBE198CACF2F994E8E4F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BE1A81A46ED04BD51FDA2804 /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
+		C23DA7980607D4E6D62A774C /* TrasherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrasherApp.swift; sourceTree = "<group>"; };
+		CC5E38E06E09AB343DAC0472 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		CE3DC101A5DAAAE96B665E5B /* photos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = photos; sourceTree = SOURCE_ROOT; };
+		DBB445A4AFD41C84F7046437 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		DCE59FBD0256465D24D6101F /* TopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBar.swift; sourceTree = "<group>"; };
+		DD58D34A95F0F4FBF10E1580 /* Trasher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Trasher.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		2552FC79A1945B41DA983D26 /* Trasher */ = {
+			isa = PBXGroup;
+			children = (
+				A71BBBE198CACF2F994E8E4F /* Assets.xcassets */,
+				DBB445A4AFD41C84F7046437 /* ContentView.swift */,
+				CC5E38E06E09AB343DAC0472 /* Photo.swift */,
+				BE1A81A46ED04BD51FDA2804 /* PhotoCell.swift */,
+				1C08F712864DAE1D2F010A2D /* PhotoGridView.swift */,
+				331F86BFD71CB93AFC8C93FD /* PhotoLibrary.swift */,
+				4D9BE816459137979978F649 /* PhotoStore.swift */,
+				1575FD6AA4912541D925E091 /* PreviewOverlay.swift */,
+				23D963FD2DB6C519207FF874 /* ThumbnailLoader.swift */,
+				DCE59FBD0256465D24D6101F /* TopBar.swift */,
+				DD58D34A95F0F4FBF10E1580 /* Trasher.entitlements */,
+				C23DA7980607D4E6D62A774C /* TrasherApp.swift */,
+			);
+			path = Trasher;
+			sourceTree = "<group>";
+		};
+		9D4B478F212865E617BE653D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A37374321E8A4AA7FFE91644 /* Trasher.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		EDAB5027BDFCF5B28C802E93 = {
+			isa = PBXGroup;
+			children = (
+				CE3DC101A5DAAAE96B665E5B /* photos */,
+				2552FC79A1945B41DA983D26 /* Trasher */,
+				9D4B478F212865E617BE653D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3E46295326921895EF1B32EE /* Trasher */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CCADBE90028A2DEDCC97DA6D /* Build configuration list for PBXNativeTarget "Trasher" */;
+			buildPhases = (
+				7A9AB3775F33BD6517681248 /* Sources */,
+				724B1C72EC29357F4E04795B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Trasher;
+			packageProductDependencies = (
+			);
+			productName = Trasher;
+			productReference = A37374321E8A4AA7FFE91644 /* Trasher.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CF3C0032363DFE7B3FAC1527 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = AFED0CF9A6155CCF245250B0 /* Build configuration list for PBXProject "Trasher" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = EDAB5027BDFCF5B28C802E93;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9D4B478F212865E617BE653D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3E46295326921895EF1B32EE /* Trasher */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		724B1C72EC29357F4E04795B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55E42EFAFE133E77F38E5F0B /* Assets.xcassets in Resources */,
+				3429BEE1D51EA68249213548 /* photos in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7A9AB3775F33BD6517681248 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A71FC0463026B7305F2DDADC /* ContentView.swift in Sources */,
+				4F49A059ECB157ECB7BE9350 /* Photo.swift in Sources */,
+				FFEE1047F1341DFCD65639FB /* PhotoCell.swift in Sources */,
+				C602CB5F8AFEE9ABFEE9CB02 /* PhotoGridView.swift in Sources */,
+				969B5D61731626C6EDCC5C80 /* PhotoLibrary.swift in Sources */,
+				8EA4A701E85AE8B9D7E4EF54 /* PhotoStore.swift in Sources */,
+				1E7A08677ACF28FD32B3D00F /* PreviewOverlay.swift in Sources */,
+				1C015A654167E1CAD74AB9C7 /* ThumbnailLoader.swift in Sources */,
+				8DC3B9111B9538666038370B /* TopBar.swift in Sources */,
+				00C4976269ECB428E41AA637 /* TrasherApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		8ED8A8F08343C6D84DDB0316 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Trasher/Trasher.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Trasher;
+				INFOPLIST_KEY_CFBundleName = Trasher;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Trasher keeps the photos you select and moves the rest to Recently Deleted.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.trasher.app;
+				PRODUCT_NAME = Trasher;
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+			};
+			name = Debug;
+		};
+		A0A8244EA393562B809281E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		A24AD84CA8C5FFD34C3C4816 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Trasher/Trasher.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Trasher;
+				INFOPLIST_KEY_CFBundleName = Trasher;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Trasher keeps the photos you select and moves the rest to Recently Deleted.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.trasher.app;
+				PRODUCT_NAME = Trasher;
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+			};
+			name = Release;
+		};
+		FD509EE46D424618CAA28360 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AFED0CF9A6155CCF245250B0 /* Build configuration list for PBXProject "Trasher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FD509EE46D424618CAA28360 /* Debug */,
+				A0A8244EA393562B809281E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CCADBE90028A2DEDCC97DA6D /* Build configuration list for PBXNativeTarget "Trasher" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8ED8A8F08343C6D84DDB0316 /* Debug */,
+				A24AD84CA8C5FFD34C3C4816 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CF3C0032363DFE7B3FAC1527 /* Project object */;
+}

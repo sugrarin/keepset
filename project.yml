@@ -1,0 +1,43 @@
+name: Trasher
+options:
+  bundleIdPrefix: com.trasher
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  SWIFT_VERSION: "6.0"
+  MACOSX_DEPLOYMENT_TARGET: "14.0"
+targets:
+  Trasher:
+    type: application
+    platform: macOS
+    sources:
+      - path: Trasher
+        excludes:
+          - "**/.DS_Store"
+      - path: photos
+        type: folder
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.trasher.app
+        PRODUCT_NAME: Trasher
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Trasher
+        INFOPLIST_KEY_CFBundleName: Trasher
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.photography
+        INFOPLIST_KEY_NSHighResolutionCapable: YES
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Trasher keeps the photos you select and moves the rest to Recently Deleted.
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: Trasher/Trasher.entitlements
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: YES
+        COMBINE_HIDPI_IMAGES: YES
+        SWIFT_STRICT_CONCURRENCY: complete
+    entitlements:
+      path: Trasher/Trasher.entitlements
+    scheme:
+      environmentVariables:
+        TRASHER_PHOTOS_DIR: $(SRCROOT)/photos
