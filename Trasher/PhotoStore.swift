@@ -4,12 +4,14 @@ import Observation
 enum WorkspaceMode: Equatable {
     case select
     case confirm
+    case trash
 }
 
 @MainActor
 @Observable
 final class PhotoStore {
     var photos: [Photo] = []
+    var trashedPhotos: [Photo] = []
     var selectedIDs: Set<Photo.ID> = []
     var mode: WorkspaceMode = .select
     var columnCount: Double = 5
@@ -19,6 +21,7 @@ final class PhotoStore {
     var isDragSelecting = false
 
     private var library: FolderPhotoLibrary
+    private var reviewIDs: Set<Photo.ID> = []
     private var dragAnchorID: Photo.ID?
     private var dragSnapshot: Set<Photo.ID> = []
     private var dragDidMove = false
@@ -28,7 +31,9 @@ final class PhotoStore {
         case .select:
             return photos
         case .confirm:
-            return photos.filter { selectedIDs.contains($0.id) }
+            return photos.filter { reviewIDs.contains($0.id) }
+        case .trash:
+            return trashedPhotos
         }
     }
 
@@ -42,6 +47,8 @@ final class PhotoStore {
         Int(columnCount.rounded())
     }
 
+    var trashedCount: Int { trashedPhotos.count }
+
     init() {
         let directory = WorkingPhotosDirectory.resolve()
         self.directory = directory
@@ -53,7 +60,8 @@ final class PhotoStore {
         defer { isBusy = false }
         do {
             photos = try library.loadPhotos()
-            selectedIDs = selectedIDs.intersection(Set(photos.map(\.id)))
+            trashedPhotos = try library.loadTrashedPhotos()
+            selectedIDs = selectedIDs.intersection(Set(displayedPhotos.map(\.id)))
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -65,11 +73,26 @@ final class PhotoStore {
             selectedIDs = []
         case .confirm:
             mode = .select
+            reviewIDs = []
+        case .trash:
+            selectedIDs = []
+            mode = .select
         }
     }
 
+    func openTrash() {
+        guard mode != .confirm else { return }
+        selectedIDs = []
+        mode = .trash
+    }
+
     func toggle(_ photo: Photo) {
-        guard mode == .select else { return }
+        switch mode {
+        case .select, .trash:
+            break
+        case .confirm:
+            guard reviewIDs.contains(photo.id) else { return }
+        }
         if selectedIDs.contains(photo.id) {
             selectedIDs.remove(photo.id)
         } else {
@@ -78,7 +101,7 @@ final class PhotoStore {
     }
 
     func handleDragSelect(at photo: Photo) {
-        guard mode == .select else { return }
+        guard mode == .select || mode == .trash else { return }
         if dragAnchorID == nil {
             dragAnchorID = photo.id
             dragSnapshot = selectedIDs
@@ -117,25 +140,55 @@ final class PhotoStore {
     }
 
     func selectAll() {
-        guard mode == .select else { return }
-        selectedIDs = Set(photos.map(\.id))
+        selectedIDs = Set(displayedPhotos.map(\.id))
     }
 
     func keep() {
         guard mode == .select, !selectedIDs.isEmpty else { return }
+        reviewIDs = selectedIDs
         mode = .confirm
     }
 
     func confirmKeep() async {
-        guard mode == .confirm, !selectedIDs.isEmpty else { return }
+        guard mode == .confirm else { return }
         let toDelete = photos.filter { !selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
         do {
-            try library.deletePhotos(toDelete)
+            try library.moveToTrash(toDelete)
             photos.removeAll { !selectedIDs.contains($0.id) }
+            trashedPhotos = try library.loadTrashedPhotos()
             selectedIDs = []
+            reviewIDs = []
             mode = .select
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func restoreSelected() async {
+        guard mode == .trash, !selectedIDs.isEmpty else { return }
+        let toRestore = trashedPhotos.filter { selectedIDs.contains($0.id) }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            try library.restorePhotos(toRestore)
+            photos = try library.loadPhotos()
+            trashedPhotos = try library.loadTrashedPhotos()
+            selectedIDs = []
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func emptyTrash() async {
+        guard mode == .trash else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            try library.emptyTrash()
+            trashedPhotos = []
+            selectedIDs = []
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -147,8 +200,10 @@ final class PhotoStore {
         do {
             try library.resetFromSeed()
             selectedIDs = []
+            reviewIDs = []
             mode = .select
             photos = try library.loadPhotos()
+            trashedPhotos = try library.loadTrashedPhotos()
         } catch {
             errorMessage = error.localizedDescription
         }

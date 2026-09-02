@@ -4,6 +4,7 @@ struct PhotoCell: View {
     let photo: Photo
     let isSelected: Bool
     let isDragSelecting: Bool
+    let dimsIfUnselected: Bool
     let columnCount: Int
     let onToggle: () -> Void
     let onPreview: (Bool) -> Void
@@ -35,6 +36,10 @@ struct PhotoCell: View {
                 }
             }
             .clipped()
+            .overlay {
+                Rectangle()
+                    .fill(.black.opacity(dimsIfUnselected && !isSelected ? 0.45 : 0))
+            }
             .overlay {
                 if isSelected {
                     Rectangle()

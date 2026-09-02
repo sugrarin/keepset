@@ -25,6 +25,11 @@ struct TrasherApp: App {
                 Button("Show Photos Folder") {
                     NSWorkspace.shared.open(store.directory)
                 }
+
+                Button("Recently Deleted") {
+                    store.openTrash()
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
             }
         }
     }

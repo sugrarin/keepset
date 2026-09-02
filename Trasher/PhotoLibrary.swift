@@ -97,15 +97,72 @@ enum WorkingPhotosDirectory {
 struct FolderPhotoLibrary: Sendable {
     let directory: URL
 
+    var trashDirectory: URL {
+        directory.appendingPathComponent(".Trash", isDirectory: true)
+    }
+
     func loadPhotos() throws -> [Photo] {
+        try loadPhotos(from: directory)
+    }
+
+    func loadTrashedPhotos() throws -> [Photo] {
+        try loadPhotos(from: trashDirectory, missingOK: true)
+    }
+
+    func moveToTrash(_ photos: [Photo]) throws {
+        let fm = FileManager.default
+        try fm.createDirectory(at: trashDirectory, withIntermediateDirectories: true)
+        for photo in photos {
+            guard canMutate(photo.url) else { continue }
+            let destination = uniqueURL(in: trashDirectory, named: photo.filename)
+            try fm.moveItem(at: photo.url, to: destination)
+        }
+    }
+
+    func restorePhotos(_ photos: [Photo]) throws {
+        let fm = FileManager.default
+        try fm.createDirectory(at: directory, withIntermediateDirectories: true)
+        for photo in photos {
+            guard canMutate(photo.url) else { continue }
+            let destination = uniqueURL(in: directory, named: photo.filename)
+            try fm.moveItem(at: photo.url, to: destination)
+        }
+    }
+
+    func emptyTrash() throws {
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: trashDirectory.path) else { return }
+        let trashed = try loadTrashedPhotos()
+        for photo in trashed {
+            guard canMutate(photo.url) else { continue }
+            try fm.removeItem(at: photo.url)
+        }
+    }
+
+    func resetFromSeed() throws {
+        guard let seed = WorkingPhotosDirectory.seedURL else {
+            throw PhotoLibraryError.seedMissing
+        }
+        let fm = FileManager.default
+        try fm.createDirectory(at: directory, withIntermediateDirectories: true)
+        let existing = try loadPhotos()
+        for photo in existing {
+            try? fm.removeItem(at: photo.url)
+        }
+        try? emptyTrash()
+        try WorkingPhotosDirectory.copyImages(from: seed, to: directory)
+    }
+
+    private func loadPhotos(from folder: URL, missingOK: Bool = false) throws -> [Photo] {
         let fm = FileManager.default
         var isDirectory: ObjCBool = false
-        guard fm.fileExists(atPath: directory.path, isDirectory: &isDirectory), isDirectory.boolValue else {
-            throw PhotoLibraryError.directoryMissing(directory)
+        guard fm.fileExists(atPath: folder.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            if missingOK { return [] }
+            throw PhotoLibraryError.directoryMissing(folder)
         }
 
         let keys: [URLResourceKey] = [.contentModificationDateKey, .isRegularFileKey]
-        let files = try fm.contentsOfDirectory(at: directory, includingPropertiesForKeys: keys)
+        let files = try fm.contentsOfDirectory(at: folder, includingPropertiesForKeys: keys)
         return files.compactMap { url -> Photo? in
             guard WorkingPhotosDirectory.isImage(url) else { return nil }
             let values = try? url.resourceValues(forKeys: Set(keys))
@@ -122,29 +179,35 @@ struct FolderPhotoLibrary: Sendable {
         }
     }
 
-    func deletePhotos(_ photos: [Photo]) throws {
+    private func canMutate(_ url: URL) -> Bool {
         let fm = FileManager.default
         let bundlePath = URL(fileURLWithPath: Bundle.main.bundlePath).standardizedFileURL.path
-        for photo in photos {
-            let path = photo.url.standardizedFileURL.path
-            if path == bundlePath || path.hasPrefix(bundlePath + "/") {
-                continue
-            }
-            guard fm.fileExists(atPath: photo.url.path) else { continue }
-            try fm.trashItem(at: photo.url, resultingItemURL: nil)
+        let path = url.standardizedFileURL.path
+        if path == bundlePath || path.hasPrefix(bundlePath + "/") {
+            return false
         }
+        return fm.fileExists(atPath: url.path)
     }
 
-    func resetFromSeed() throws {
-        guard let seed = WorkingPhotosDirectory.seedURL else {
-            throw PhotoLibraryError.seedMissing
-        }
+    private func uniqueURL(in folder: URL, named filename: String) -> URL {
         let fm = FileManager.default
-        try fm.createDirectory(at: directory, withIntermediateDirectories: true)
-        let existing = try loadPhotos()
-        for photo in existing {
-            try? fm.removeItem(at: photo.url)
+        let ext = URL(fileURLWithPath: filename).pathExtension
+        let stem = URL(fileURLWithPath: filename).deletingPathExtension().lastPathComponent
+        var index = 1
+        while true {
+            let name: String
+            if index == 1 {
+                name = filename
+            } else if ext.isEmpty {
+                name = "\(stem)-\(index)"
+            } else {
+                name = "\(stem)-\(index).\(ext)"
+            }
+            let candidate = folder.appendingPathComponent(name)
+            if !fm.fileExists(atPath: candidate.path) {
+                return candidate
+            }
+            index += 1
         }
-        try WorkingPhotosDirectory.copyImages(from: seed, to: directory)
     }
 }

@@ -17,6 +17,7 @@ struct ContentView: View {
                     columns: store.columns,
                     selectedIDs: store.selectedIDs,
                     isDragSelecting: store.isDragSelecting,
+                    dimsIfUnselected: store.mode == .confirm,
                     onToggle: store.toggle,
                     onPreview: { previewPhoto = $0 },
                     onDragSelect: { photo in
@@ -25,11 +26,15 @@ struct ContentView: View {
                     },
                     onDragSelectEnd: store.endDragSelect
                 )
-                .opacity(store.photos.isEmpty ? 0 : 1)
+                .opacity(store.displayedPhotos.isEmpty ? 0 : 1)
 
-                if store.photos.isEmpty, !store.isBusy {
-                    EmptySandboxView {
-                        Task { await store.resetSandbox() }
+                if store.displayedPhotos.isEmpty, !store.isBusy {
+                    if store.mode == .trash {
+                        EmptyTrashView()
+                    } else {
+                        EmptySandboxView {
+                            Task { await store.resetSandbox() }
+                        }
                     }
                 }
             }
@@ -85,11 +90,30 @@ struct ContentView: View {
         switch store.mode {
         case .select where store.selectedCount > 0:
             store.keep()
-        case .confirm where store.selectedCount > 0:
+        case .confirm:
             Task { await store.confirmKeep() }
-        case .select, .confirm:
+        case .trash where store.selectedCount > 0:
+            Task { await store.restoreSelected() }
+        case .select, .trash:
             break
         }
+    }
+}
+
+private struct EmptyTrashView: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "trash")
+                .font(.system(size: 42, weight: .light))
+                .foregroundStyle(.white.opacity(0.55))
+            Text("Trash is empty")
+                .font(.title3.weight(.medium))
+            Text("Photos you drop while keeping will land here, so you can restore a mistake.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 360)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
