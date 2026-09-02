@@ -7,9 +7,6 @@ struct TopBar: View {
         @Bindable var store = store
 
         HStack(spacing: 16) {
-            Color.clear
-                .frame(width: 72, height: 12)
-
             gridSizeSlider
 
             Spacer(minLength: 12)
@@ -61,7 +58,7 @@ struct TopBar: View {
         }
         .font(.system(size: 13, weight: .medium))
         .foregroundStyle(.white)
-        .padding(.trailing, 16)
+        .padding(.horizontal, 16)
         .frame(height: 54)
         .background {
             Rectangle()

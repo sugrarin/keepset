@@ -43,15 +43,10 @@ struct PhotoCell: View {
                     .padding(8)
             }
             .overlay(alignment: .bottom) {
-                Color.clear
-                    .frame(height: 40)
-                    .frame(maxWidth: .infinity)
-                    .contentShape(Rectangle())
-                    .overlay {
-                        LoupeButton()
-                            .opacity(hovering ? 1 : 0)
-                            .offset(y: hovering ? 0 : 4)
-                    }
+                LoupeButton()
+                    .padding(.bottom, 8)
+                    .opacity(hovering ? 1 : 0)
+                    .offset(y: hovering ? 0 : 4)
                     .onHover { inside in
                         onPreview(inside)
                     }

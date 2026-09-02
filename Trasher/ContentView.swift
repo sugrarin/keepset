@@ -30,7 +30,6 @@ struct ContentView: View {
             .clipped()
         }
         .background(Color.black)
-        .ignoresSafeArea(.container, edges: .top)
         .overlay {
             if let previewPhoto {
                 PreviewOverlay(photo: previewPhoto)
