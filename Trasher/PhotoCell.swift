@@ -38,7 +38,7 @@ struct PhotoCell: View {
             .overlay {
                 if isSelected {
                     Rectangle()
-                        .strokeBorder(.white, lineWidth: 2)
+                        .strokeBorder(.white, lineWidth: 4)
                 }
             }
             .overlay(alignment: .topTrailing) {
