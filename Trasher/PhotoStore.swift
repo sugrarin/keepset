@@ -2,7 +2,6 @@ import Foundation
 import Observation
 
 enum WorkspaceMode: Equatable {
-    case browse
     case select
     case confirm
 }
@@ -12,7 +11,7 @@ enum WorkspaceMode: Equatable {
 final class PhotoStore {
     var photos: [Photo] = []
     var selectedIDs: Set<Photo.ID> = []
-    var mode: WorkspaceMode = .browse
+    var mode: WorkspaceMode = .select
     var columnCount: Double = 5
     var isBusy = false
     var errorMessage: String?
@@ -22,7 +21,7 @@ final class PhotoStore {
 
     var displayedPhotos: [Photo] {
         switch mode {
-        case .browse, .select:
+        case .select:
             return photos
         case .confirm:
             return photos.filter { selectedIDs.contains($0.id) }
@@ -37,10 +36,6 @@ final class PhotoStore {
 
     var columns: Int {
         Int(columnCount.rounded())
-    }
-
-    var isSelectMode: Bool {
-        mode == .select || mode == .confirm
     }
 
     init() {
@@ -60,25 +55,17 @@ final class PhotoStore {
         }
     }
 
-    func enterSelectMode() {
-        guard mode == .browse else { return }
-        mode = .select
-    }
-
     func cancel() {
         switch mode {
-        case .browse:
-            break
         case .select:
             selectedIDs = []
-            mode = .browse
         case .confirm:
             mode = .select
         }
     }
 
     func toggle(_ photo: Photo) {
-        guard isSelectMode else { return }
+        guard mode == .select else { return }
         if selectedIDs.contains(photo.id) {
             selectedIDs.remove(photo.id)
         } else {
@@ -87,15 +74,8 @@ final class PhotoStore {
     }
 
     func selectAll() {
-        switch mode {
-        case .browse:
-            mode = .select
-            selectedIDs = Set(photos.map(\.id))
-        case .select:
-            selectedIDs = Set(photos.map(\.id))
-        case .confirm:
-            break
-        }
+        guard mode == .select else { return }
+        selectedIDs = Set(photos.map(\.id))
     }
 
     func keep() {
@@ -112,7 +92,7 @@ final class PhotoStore {
             try library.deletePhotos(toDelete)
             photos.removeAll { !selectedIDs.contains($0.id) }
             selectedIDs = []
-            mode = .browse
+            mode = .select
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -124,7 +104,7 @@ final class PhotoStore {
         do {
             try library.resetFromSeed()
             selectedIDs = []
-            mode = .browse
+            mode = .select
             photos = try library.loadPhotos()
         } catch {
             errorMessage = error.localizedDescription

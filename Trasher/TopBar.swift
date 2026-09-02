@@ -26,17 +26,9 @@ struct TopBar: View {
 
             Spacer(minLength: 12)
 
-            if store.mode != .browse {
+            if store.mode == .confirm || store.selectedCount > 0 {
                 Button("Cancel") {
                     store.cancel()
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(.white.opacity(0.08), in: Capsule())
-            } else {
-                Button("Select") {
-                    store.enterSelectMode()
                 }
                 .buttonStyle(.plain)
                 .padding(.horizontal, 12)
@@ -55,7 +47,7 @@ struct TopBar: View {
                 .foregroundStyle(.white)
                 .background(store.selectedCount == 0 ? Color.white.opacity(0.12) : Color(red: 0.22, green: 0.72, blue: 0.42), in: Capsule())
                 .disabled(store.selectedCount == 0 || store.isBusy)
-            } else if store.mode == .select, store.selectedCount > 0 {
+            } else if store.selectedCount > 0 {
                 Button("Keep") {
                     store.keep()
                 }
@@ -73,12 +65,9 @@ struct TopBar: View {
         .frame(height: 54)
         .background {
             Rectangle()
-                .fill(.ultraThinMaterial)
-                .overlay {
-                    store.mode == .confirm
-                        ? Color(red: 0.12, green: 0.32, blue: 0.18).opacity(0.55)
-                        : Color.clear
-                }
+                .fill(store.mode == .confirm
+                    ? Color(red: 0.06, green: 0.14, blue: 0.09)
+                    : Color.black)
         }
         .overlay(alignment: .bottom) {
             Divider().opacity(0.35)
@@ -104,12 +93,9 @@ struct TopBar: View {
     @ViewBuilder
     private var statusLabel: some View {
         switch store.mode {
-        case .browse:
-            Text(store.photos.count == 1 ? "1 photo" : "\(store.photos.count) photos")
-                .foregroundStyle(.white.opacity(0.7))
         case .select:
             if store.selectedCount == 0 {
-                Text("Select the photos to keep")
+                Text(store.photos.count == 1 ? "1 photo" : "\(store.photos.count) photos")
                     .foregroundStyle(.white.opacity(0.7))
             } else {
                 Text("\(store.selectedCount) selected")

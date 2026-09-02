@@ -4,7 +4,6 @@ struct PhotoGridView: View {
     let photos: [Photo]
     let columns: Int
     let selectedIDs: Set<Photo.ID>
-    let isSelectMode: Bool
     let onToggle: (Photo) -> Void
     let onPreview: (Photo?) -> Void
 
@@ -19,7 +18,6 @@ struct PhotoGridView: View {
                     PhotoCell(
                         photo: photo,
                         isSelected: selectedIDs.contains(photo.id),
-                        isSelectMode: isSelectMode,
                         columnCount: columns,
                         onToggle: { onToggle(photo) },
                         onPreview: { hovering in

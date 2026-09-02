@@ -3,7 +3,6 @@ import SwiftUI
 struct PhotoCell: View {
     let photo: Photo
     let isSelected: Bool
-    let isSelectMode: Bool
     let columnCount: Int
     let onToggle: () -> Void
     let onPreview: (Bool) -> Void
@@ -34,26 +33,25 @@ struct PhotoCell: View {
             }
             .clipped()
             .overlay {
-                Rectangle()
-                    .fill(.black.opacity(hovering && !isSelectMode ? 0.08 : 0))
-            }
-            .overlay {
-                if isSelectMode, isSelected {
+                if isSelected {
                     Rectangle()
                         .strokeBorder(.white, lineWidth: 2)
                 }
             }
             .overlay(alignment: .topTrailing) {
-                if isSelectMode {
-                    SelectionMarker(isSelected: isSelected)
-                        .padding(8)
-                }
+                SelectionMarker(isSelected: isSelected)
+                    .padding(8)
             }
             .overlay(alignment: .bottom) {
-                LoupeButton()
-                    .padding(.bottom, 8)
-                    .opacity(hovering ? 1 : 0)
-                    .offset(y: hovering ? 0 : 4)
+                Color.clear
+                    .frame(height: 40)
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                    .overlay {
+                        LoupeButton()
+                            .opacity(hovering ? 1 : 0)
+                            .offset(y: hovering ? 0 : 4)
+                    }
                     .onHover { inside in
                         onPreview(inside)
                     }
@@ -61,11 +59,7 @@ struct PhotoCell: View {
             }
             .contentShape(Rectangle())
             .onHover { hovering = $0 }
-            .onTapGesture {
-                if isSelectMode {
-                    onToggle()
-                }
-            }
+            .onTapGesture(perform: onToggle)
             .animation(.easeOut(duration: 0.12), value: hovering)
             .animation(.easeOut(duration: 0.12), value: isSelected)
             .task(id: "\(photo.id)-\(maxPixel)") {

@@ -6,29 +6,31 @@ struct ContentView: View {
     @State private var previewPhoto: Photo?
 
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
+        VStack(spacing: 0) {
+            TopBar()
 
-            PhotoGridView(
-                photos: store.displayedPhotos,
-                columns: store.columns,
-                selectedIDs: store.selectedIDs,
-                isSelectMode: store.isSelectMode,
-                onToggle: store.toggle,
-                onPreview: { previewPhoto = $0 }
-            )
-            .opacity(store.photos.isEmpty ? 0 : 1)
+            ZStack {
+                Color.black
 
-            if store.photos.isEmpty, !store.isBusy {
-                EmptySandboxView {
-                    Task { await store.resetSandbox() }
+                PhotoGridView(
+                    photos: store.displayedPhotos,
+                    columns: store.columns,
+                    selectedIDs: store.selectedIDs,
+                    onToggle: store.toggle,
+                    onPreview: { previewPhoto = $0 }
+                )
+                .opacity(store.photos.isEmpty ? 0 : 1)
+
+                if store.photos.isEmpty, !store.isBusy {
+                    EmptySandboxView {
+                        Task { await store.resetSandbox() }
+                    }
                 }
             }
-
+            .clipped()
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            TopBar()
-        }
+        .background(Color.black)
+        .ignoresSafeArea(.container, edges: .top)
         .overlay {
             if let previewPhoto {
                 PreviewOverlay(photo: previewPhoto)
@@ -80,7 +82,7 @@ struct ContentView: View {
             store.keep()
         case .confirm where store.selectedCount > 0:
             Task { await store.confirmKeep() }
-        default:
+        case .select, .confirm:
             break
         }
     }
@@ -124,5 +126,9 @@ private final class WindowHookView: NSView {
         window.backgroundColor = .black
         window.isMovableByWindowBackground = false
         window.minSize = NSSize(width: 760, height: 520)
+        if let titlebar = window.standardWindowButton(.closeButton)?.superview {
+            titlebar.wantsLayer = true
+            titlebar.layer?.backgroundColor = NSColor.black.cgColor
+        }
     }
 }
