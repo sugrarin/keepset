@@ -17,7 +17,6 @@ struct ContentView: View {
                     columns: store.columns,
                     selectedIDs: store.selectedIDs,
                     isDragSelecting: store.isDragSelecting,
-                    dimsIfUnselected: store.mode == .confirm,
                     onToggle: store.toggle,
                     onPreview: { previewPhoto = $0 },
                     onDragSelect: { photo in
@@ -31,7 +30,7 @@ struct ContentView: View {
                 if store.displayedPhotos.isEmpty, !store.isBusy {
                     if store.mode == .trash {
                         EmptyTrashView()
-                    } else {
+                    } else if store.photos.isEmpty {
                         EmptySandboxView {
                             Task { await store.resetSandbox() }
                         }
@@ -76,6 +75,9 @@ struct ContentView: View {
         .onChange(of: store.mode) { _, _ in
             previewPhoto = nil
         }
+        .onChange(of: store.filter) { _, _ in
+            previewPhoto = nil
+        }
     }
 
     private func handleEscape() {
@@ -89,9 +91,7 @@ struct ContentView: View {
     private func handleReturn() {
         switch store.mode {
         case .select where store.selectedCount > 0:
-            store.keep()
-        case .confirm:
-            Task { await store.confirmKeep() }
+            Task { await store.keep() }
         case .trash where store.selectedCount > 0:
             Task { await store.restoreSelected() }
         case .select, .trash:

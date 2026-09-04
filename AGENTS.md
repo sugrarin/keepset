@@ -4,8 +4,9 @@
 - Build with:
 
   ```
-  xcodebuild -project Trasher.xcodeproj -scheme Trasher -configuration Debug build
+  xcodebuild -project Trasher.xcodeproj -scheme Trasher -configuration Debug -derivedDataPath build build
   ```
 
-- After a successful build, relaunch `Trasher.app` so the running app matches the new binary.
+- The runnable app is `build/Build/Products/Debug/Trasher.app`. Do not leave a second copy in `~/Library/Developer/Xcode/DerivedData`.
+- After a successful build, relaunch that `Trasher.app` so the running app matches the new binary.
 - After finishing a requested change, commit and push. Do not leave the work only local.

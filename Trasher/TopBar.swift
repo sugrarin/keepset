@@ -4,21 +4,23 @@ struct TopBar: View {
     @Environment(PhotoStore.self) private var store
 
     var body: some View {
-        @Bindable var store = store
-
         HStack(spacing: 16) {
             gridSizeSlider
 
             Spacer(minLength: 12)
 
-            HStack(spacing: 8) {
+            HStack(spacing: 10) {
                 Text(store.mode == .trash ? "Trash" : "Sandbox")
                     .font(.system(size: 10, weight: .semibold))
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
                     .background(.white.opacity(0.12), in: Capsule())
                     .foregroundStyle(.white.opacity(0.8))
-                statusLabel
+                if store.mode == .select {
+                    FilterTabs()
+                } else {
+                    statusLabel
+                }
             }
 
             Spacer(minLength: 12)
@@ -33,18 +35,7 @@ struct TopBar: View {
                 .background(.white.opacity(0.08), in: Capsule())
             }
 
-            if store.mode == .confirm {
-                Button("Yes, fine!") {
-                    Task { await store.confirmKeep() }
-                }
-                .buttonStyle(.plain)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .foregroundStyle(.white)
-                .background(Color(red: 0.22, green: 0.72, blue: 0.42), in: Capsule())
-                .disabled(store.isBusy)
-            } else if store.mode == .trash, store.selectedCount > 0 {
+            if store.mode == .trash, store.selectedCount > 0 {
                 Button("Restore") {
                     Task { await store.restoreSelected() }
                 }
@@ -65,15 +56,7 @@ struct TopBar: View {
                 .background(.white.opacity(0.08), in: Capsule())
                 .disabled(store.isBusy)
             } else if store.mode == .select, store.selectedCount > 0 {
-                Button("Keep") {
-                    store.keep()
-                }
-                .buttonStyle(.plain)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .foregroundStyle(.black)
-                .background(.white, in: Capsule())
+                commitButton
             }
 
             trashButton
@@ -107,47 +90,39 @@ struct TopBar: View {
         }
     }
 
-    @ViewBuilder
-    private var statusLabel: some View {
-        switch store.mode {
-        case .select:
-            if store.selectedCount == 0 {
-                Text(store.photos.count == 1 ? "1 photo" : "\(store.photos.count) photos")
-                    .foregroundStyle(.white.opacity(0.7))
-            } else {
-                Text("\(store.selectedCount) selected")
-                    .foregroundStyle(.white.opacity(0.85))
+    private var commitButton: some View {
+        Button {
+            Task { await store.keep() }
+        } label: {
+            VStack(spacing: 1) {
+                Text("Keep \(store.selectedCount)")
+                    .font(.system(size: 13, weight: .semibold))
+                Text("Delete \(store.pendingDeleteCount)")
+                    .font(.system(size: 10, weight: .medium))
+                    .opacity(0.55)
             }
-        case .confirm:
-            Text(confirmCopy)
-                .foregroundStyle(.white.opacity(0.85))
-        case .trash:
-            if store.selectedCount == 0 {
-                Text(store.trashedCount == 1 ? "1 photo" : "\(store.trashedCount) photos")
-                    .foregroundStyle(.white.opacity(0.7))
-            } else {
-                Text("\(store.selectedCount) selected")
-                    .foregroundStyle(.white.opacity(0.85))
-            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 5)
+            .foregroundStyle(.black)
+            .background(.white, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
+        .buttonStyle(.plain)
+        .disabled(store.isBusy)
     }
 
-    private var confirmCopy: String {
-        let keep = store.selectedCount
-        let drop = store.pendingDeleteCount
-        if keep == 0 {
-            return drop == 1 ? "Move this photo to Trash" : "Move all \(drop) photos to Trash"
+    @ViewBuilder
+    private var statusLabel: some View {
+        if store.selectedCount == 0 {
+            Text(store.trashedCount == 1 ? "1 photo" : "\(store.trashedCount) photos")
+                .foregroundStyle(.white.opacity(0.7))
+        } else {
+            Text("\(store.selectedCount) selected")
+                .foregroundStyle(.white.opacity(0.85))
         }
-        if drop == 0 {
-            return keep == 1 ? "Keep this photo" : "Keep these \(keep) photos"
-        }
-        return "Keep \(keep), move \(drop) to Trash"
     }
 
     private var barFill: Color {
         switch store.mode {
-        case .confirm:
-            Color(red: 0.06, green: 0.14, blue: 0.09)
         case .trash:
             Color(red: 0.14, green: 0.08, blue: 0.06)
         case .select:
@@ -181,6 +156,39 @@ struct TopBar: View {
         }
         .buttonStyle(.plain)
         .help("Recently Deleted")
-        .disabled(store.mode == .confirm)
+    }
+}
+
+private struct FilterTabs: View {
+    @Environment(PhotoStore.self) private var store
+
+    var body: some View {
+        HStack(spacing: 2) {
+            tab(.all, title: "All", count: store.photos.count)
+            tab(.keep, title: "Keep", count: store.selectedCount)
+            tab(.delete, title: "Delete", count: store.pendingDeleteCount)
+        }
+        .padding(2)
+        .background(.white.opacity(0.08), in: Capsule())
+    }
+
+    private func tab(_ filter: PhotoFilter, title: String, count: Int) -> some View {
+        let enabled = store.isFilterEnabled(filter)
+        let selected = store.filter == filter
+        return Button {
+            store.setFilter(filter)
+        } label: {
+            Text("\(title) \(count)")
+                .font(.system(size: 12, weight: selected ? .semibold : .medium))
+                .monospacedDigit()
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .foregroundStyle(.white.opacity(selected ? 0.95 : 0.72))
+                .background(selected ? Color.white.opacity(0.16) : Color.clear, in: Capsule())
+                .opacity(enabled ? 1 : 0.38)
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .help(enabled ? "\(title) photos" : "Nothing to show")
     }
 }

@@ -4,7 +4,6 @@ struct PhotoCell: View {
     let photo: Photo
     let isSelected: Bool
     let isDragSelecting: Bool
-    let dimsIfUnselected: Bool
     let columnCount: Int
     let onToggle: () -> Void
     let onPreview: (Bool) -> Void
@@ -35,14 +34,10 @@ struct PhotoCell: View {
                         .fill(.white.opacity(0.06))
                 }
             }
-            .clipped()
-            .overlay {
-                Rectangle()
-                    .fill(.black.opacity(dimsIfUnselected && !isSelected ? 0.45 : 0))
-            }
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
                 if isSelected {
-                    Rectangle()
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .strokeBorder(.white, lineWidth: 4)
                 }
             }
@@ -57,7 +52,8 @@ struct PhotoCell: View {
                     .offset(y: hovering && !isDragSelecting ? 0 : 4)
                     .allowsHitTesting(!isDragSelecting)
             }
-            .contentShape(Rectangle())
+            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .scaleEffect(isSelected ? 0.9 : 1)
             .onHover { hovering = $0 }
             .onTapGesture(perform: onToggle)
             .gesture(

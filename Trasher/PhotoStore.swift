@@ -3,8 +3,13 @@ import Observation
 
 enum WorkspaceMode: Equatable {
     case select
-    case confirm
     case trash
+}
+
+enum PhotoFilter: Equatable {
+    case all
+    case keep
+    case delete
 }
 
 @MainActor
@@ -15,13 +20,13 @@ final class PhotoStore {
     var selectedIDs: Set<Photo.ID> = []
     var mode: WorkspaceMode = .select
     var columnCount: Double = 5
+    var filter: PhotoFilter = .all
     var isBusy = false
     var errorMessage: String?
     var directory: URL
     var isDragSelecting = false
 
     private var library: FolderPhotoLibrary
-    private var reviewIDs: Set<Photo.ID> = []
     private var dragAnchorID: Photo.ID?
     private var dragSnapshot: Set<Photo.ID> = []
     private var dragDidMove = false
@@ -29,9 +34,14 @@ final class PhotoStore {
     var displayedPhotos: [Photo] {
         switch mode {
         case .select:
-            return photos
-        case .confirm:
-            return photos.filter { reviewIDs.contains($0.id) }
+            switch filter {
+            case .all:
+                return photos
+            case .keep:
+                return photos.filter { selectedIDs.contains($0.id) }
+            case .delete:
+                return photos.filter { !selectedIDs.contains($0.id) }
+            }
         case .trash:
             return trashedPhotos
         }
@@ -61,47 +71,54 @@ final class PhotoStore {
         do {
             photos = try library.loadPhotos()
             trashedPhotos = try library.loadTrashedPhotos()
-            selectedIDs = selectedIDs.intersection(Set(displayedPhotos.map(\.id)))
+            selectedIDs = selectedIDs.intersection(Set(photos.map(\.id)))
+            normalizeFilter()
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
     func cancel() {
-        switch mode {
-        case .select:
-            selectedIDs = []
-        case .confirm:
-            mode = .select
-            reviewIDs = []
-        case .trash:
-            selectedIDs = []
+        selectedIDs = []
+        filter = .all
+        if mode == .trash {
             mode = .select
         }
     }
 
     func openTrash() {
-        guard mode != .confirm else { return }
         selectedIDs = []
+        filter = .all
         mode = .trash
     }
 
-    func toggle(_ photo: Photo) {
-        switch mode {
-        case .select, .trash:
-            break
-        case .confirm:
-            guard reviewIDs.contains(photo.id) else { return }
+    func setFilter(_ next: PhotoFilter) {
+        guard isFilterEnabled(next) else { return }
+        filter = next
+    }
+
+    func isFilterEnabled(_ filter: PhotoFilter) -> Bool {
+        switch filter {
+        case .all:
+            return !photos.isEmpty
+        case .keep:
+            return selectedCount > 0
+        case .delete:
+            return pendingDeleteCount > 0
         }
+    }
+
+    func toggle(_ photo: Photo) {
         if selectedIDs.contains(photo.id) {
             selectedIDs.remove(photo.id)
         } else {
             selectedIDs.insert(photo.id)
         }
+        normalizeFilter()
     }
 
     func handleDragSelect(at photo: Photo) {
-        guard mode == .select || mode == .trash else { return }
+        guard mode == .trash || (mode == .select && filter == .all) else { return }
         if dragAnchorID == nil {
             dragAnchorID = photo.id
             dragSnapshot = selectedIDs
@@ -125,6 +142,7 @@ final class PhotoStore {
         dragSnapshot = []
         dragDidMove = false
         isDragSelecting = false
+        normalizeFilter()
     }
 
     private func applyDragRange(to currentID: Photo.ID) {
@@ -140,27 +158,24 @@ final class PhotoStore {
     }
 
     func selectAll() {
-        selectedIDs = Set(displayedPhotos.map(\.id))
+        let source = mode == .trash ? trashedPhotos : photos
+        selectedIDs = Set(source.map(\.id))
+        normalizeFilter()
     }
 
-    func keep() {
+    func keep() async {
         guard mode == .select, !selectedIDs.isEmpty else { return }
-        reviewIDs = selectedIDs
-        mode = .confirm
-    }
-
-    func confirmKeep() async {
-        guard mode == .confirm else { return }
         let toDelete = photos.filter { !selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
         do {
-            try library.moveToTrash(toDelete)
-            photos.removeAll { !selectedIDs.contains($0.id) }
-            trashedPhotos = try library.loadTrashedPhotos()
+            if !toDelete.isEmpty {
+                try library.moveToTrash(toDelete)
+                photos.removeAll { !selectedIDs.contains($0.id) }
+                trashedPhotos = try library.loadTrashedPhotos()
+            }
             selectedIDs = []
-            reviewIDs = []
-            mode = .select
+            filter = .all
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -200,12 +215,17 @@ final class PhotoStore {
         do {
             try library.resetFromSeed()
             selectedIDs = []
-            reviewIDs = []
+            filter = .all
             mode = .select
             photos = try library.loadPhotos()
             trashedPhotos = try library.loadTrashedPhotos()
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    private func normalizeFilter() {
+        guard mode == .select, !isFilterEnabled(filter) else { return }
+        filter = .all
     }
 }
