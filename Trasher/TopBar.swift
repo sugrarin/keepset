@@ -1,5 +1,15 @@
 import SwiftUI
 
+private enum BarControl {
+    static let height: CGFloat = 38
+    static let radius: CGFloat = 10
+    static let barHeight: CGFloat = 58
+
+    static var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: radius, style: .continuous)
+    }
+}
+
 struct TopBar: View {
     @Environment(PhotoStore.self) private var store
 
@@ -11,10 +21,10 @@ struct TopBar: View {
 
             HStack(spacing: 10) {
                 Text(store.mode == .trash ? "Trash" : "Sandbox")
-                    .font(.system(size: 10, weight: .semibold))
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(.white.opacity(0.12), in: Capsule())
+                    .font(.system(size: 11, weight: .semibold))
+                    .padding(.horizontal, 10)
+                    .frame(height: BarControl.height)
+                    .background(.white.opacity(0.12), in: BarControl.shape)
                     .foregroundStyle(.white.opacity(0.8))
                 if store.mode == .select {
                     FilterTabs()
@@ -26,35 +36,26 @@ struct TopBar: View {
             Spacer(minLength: 12)
 
             if store.mode != .select || store.selectedCount > 0 {
-                Button(store.mode == .trash ? "Back" : "Cancel") {
+                chromeButton(
+                    store.mode == .trash ? "Back" : "Cancel",
+                    fill: .white.opacity(0.08)
+                ) {
                     store.cancel()
                 }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(.white.opacity(0.08), in: Capsule())
             }
 
             if store.mode == .trash, store.selectedCount > 0 {
-                Button("Restore") {
+                chromeButton("Restore", fill: .white, foreground: .black, emphasized: true) {
                     Task { await store.restoreSelected() }
                 }
-                .buttonStyle(.plain)
-                .fontWeight(.semibold)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .foregroundStyle(.black)
-                .background(.white, in: Capsule())
                 .disabled(store.isBusy)
+                .allowsHitTesting(!store.isBusy)
             } else if store.mode == .trash, store.trashedCount > 0 {
-                Button("Empty Trash") {
+                chromeButton("Empty Trash", fill: .white.opacity(0.08)) {
                     Task { await store.emptyTrash() }
                 }
-                .buttonStyle(.plain)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(.white.opacity(0.08), in: Capsule())
                 .disabled(store.isBusy)
+                .allowsHitTesting(!store.isBusy)
             } else if store.mode == .select, store.selectedCount > 0 {
                 commitButton
             }
@@ -64,7 +65,7 @@ struct TopBar: View {
         .font(.system(size: 13, weight: .medium))
         .foregroundStyle(.white)
         .padding(.horizontal, 16)
-        .frame(height: 54)
+        .frame(height: BarControl.barHeight)
         .background {
             Rectangle()
                 .fill(barFill)
@@ -102,12 +103,33 @@ struct TopBar: View {
                     .opacity(0.55)
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 5)
+            .frame(height: BarControl.height)
             .foregroundStyle(.black)
-            .background(.white, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .background(.white, in: BarControl.shape)
+            .contentShape(BarControl.shape)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FillHitButtonStyle())
         .disabled(store.isBusy)
+        .allowsHitTesting(!store.isBusy)
+    }
+
+    private func chromeButton(
+        _ title: String,
+        fill: Color,
+        foreground: Color = .white,
+        emphasized: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 13, weight: emphasized ? .semibold : .medium))
+                .padding(.horizontal, 14)
+                .frame(height: BarControl.height)
+                .foregroundStyle(foreground)
+                .background(fill, in: BarControl.shape)
+                .contentShape(BarControl.shape)
+        }
+        .buttonStyle(FillHitButtonStyle())
     }
 
     @ViewBuilder
@@ -147,14 +169,15 @@ struct TopBar: View {
                         .monospacedDigit()
                 }
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 12)
+            .frame(height: BarControl.height)
             .background(
                 store.mode == .trash ? Color.white.opacity(0.16) : Color.white.opacity(0.08),
-                in: Capsule()
+                in: BarControl.shape
             )
+            .contentShape(BarControl.shape)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FillHitButtonStyle())
         .help("Recently Deleted")
     }
 }
@@ -168,8 +191,9 @@ private struct FilterTabs: View {
             tab(.keep, title: "Keep", count: store.selectedCount)
             tab(.delete, title: "Delete", count: store.pendingDeleteCount)
         }
-        .padding(2)
-        .background(.white.opacity(0.08), in: Capsule())
+        .padding(3)
+        .frame(height: BarControl.height)
+        .background(.white.opacity(0.08), in: BarControl.shape)
     }
 
     private func tab(_ filter: PhotoFilter, title: String, count: Int) -> some View {
@@ -181,14 +205,23 @@ private struct FilterTabs: View {
             Text("\(title) \(count)")
                 .font(.system(size: 12, weight: selected ? .semibold : .medium))
                 .monospacedDigit()
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
+                .padding(.horizontal, 12)
+                .frame(maxHeight: .infinity)
                 .foregroundStyle(.white.opacity(selected ? 0.95 : 0.72))
                 .background(selected ? Color.white.opacity(0.16) : Color.clear, in: Capsule())
+                .contentShape(Capsule())
                 .opacity(enabled ? 1 : 0.38)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(FillHitButtonStyle())
         .disabled(!enabled)
+        .allowsHitTesting(enabled)
         .help(enabled ? "\(title) photos" : "Nothing to show")
+    }
+}
+
+private struct FillHitButtonStyle: PrimitiveButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .onTapGesture(perform: configuration.trigger)
     }
 }

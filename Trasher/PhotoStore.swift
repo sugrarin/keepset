@@ -164,7 +164,7 @@ final class PhotoStore {
     }
 
     func keep() async {
-        guard mode == .select, !selectedIDs.isEmpty else { return }
+        guard mode == .select, !selectedIDs.isEmpty, !isBusy else { return }
         let toDelete = photos.filter { !selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }

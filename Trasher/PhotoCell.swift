@@ -53,7 +53,7 @@ struct PhotoCell: View {
                     .allowsHitTesting(!isDragSelecting)
             }
             .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .scaleEffect(isSelected ? 0.9 : 1)
+            .scaleEffect(isSelected ? 0.97 : 1)
             .onHover { hovering = $0 }
             .onTapGesture(perform: onToggle)
             .gesture(
