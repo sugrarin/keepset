@@ -14,62 +14,29 @@ struct TopBar: View {
     @Environment(PhotoStore.self) private var store
 
     var body: some View {
-        HStack(spacing: 16) {
-            gridSizeSlider
-
-            Spacer(minLength: 12)
-
-            HStack(spacing: 10) {
-                Text(store.mode == .trash ? "Trash" : "Sandbox")
-                    .font(.system(size: 11, weight: .semibold))
-                    .padding(.horizontal, 10)
-                    .frame(height: BarControl.height)
-                    .background(Theme.surface, in: BarControl.shape)
-                    .foregroundStyle(.white.opacity(0.8))
-                if store.mode == .select {
+        HStack(spacing: 12) {
+            HStack(spacing: 12) {
+                gridSizeSlider
+                if store.mode == .sandbox {
                     FilterTabs()
-                } else {
-                    statusLabel
                 }
+                Spacer(minLength: 0)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            Spacer(minLength: 12)
+            FolderPicker()
 
-            if store.mode != .select || store.selectedCount > 0 {
-                chromeButton(
-                    store.mode == .trash ? "Back" : "Cancel",
-                    fill: Theme.surface
-                ) {
-                    store.cancel()
-                }
+            HStack(spacing: 8) {
+                Spacer(minLength: 0)
+                trailingActions
             }
-
-            if store.mode == .trash, store.selectedCount > 0 {
-                chromeButton("Restore", fill: Theme.accent, emphasized: true) {
-                    Task { await store.restoreSelected() }
-                }
-                .disabled(store.isBusy)
-                .allowsHitTesting(!store.isBusy)
-            } else if store.mode == .trash, store.trashedCount > 0 {
-                chromeButton("Empty Trash", fill: Theme.surface) {
-                    Task { await store.emptyTrash() }
-                }
-                .disabled(store.isBusy)
-                .allowsHitTesting(!store.isBusy)
-            } else if store.mode == .select, store.selectedCount > 0 {
-                commitButton
-            }
-
-            trashButton
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .font(.system(size: 13, weight: .medium))
         .foregroundStyle(.white)
         .padding(.horizontal, 16)
         .frame(height: BarControl.barHeight)
-        .background {
-            Rectangle()
-                .fill(barFill)
-        }
+        .background(Theme.canvas)
         .overlay(alignment: .bottom) {
             Divider().opacity(0.12)
         }
@@ -88,6 +55,28 @@ struct TopBar: View {
             Image(systemName: "square.grid.4x3.fill")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.7))
+        }
+    }
+
+    @ViewBuilder
+    private var trailingActions: some View {
+        if store.mode == .sandbox, store.selectedCount > 0 {
+            chromeButton("Cancel", fill: Theme.surface) {
+                store.cancel()
+            }
+            commitButton
+        } else if store.mode == .trash, store.selectedCount > 0 {
+            chromeButton("Restore", fill: Theme.accent, emphasized: true) {
+                Task { await store.restoreSelected() }
+            }
+            .disabled(store.isBusy)
+            .allowsHitTesting(!store.isBusy)
+        } else if store.mode == .trash, store.trashedCount > 0 {
+            chromeButton("Empty Trash", fill: Theme.surface) {
+                Task { await store.emptyTrash() }
+            }
+            .disabled(store.isBusy)
+            .allowsHitTesting(!store.isBusy)
         }
     }
 
@@ -131,47 +120,45 @@ struct TopBar: View {
         }
         .buttonStyle(FillHitButtonStyle())
     }
+}
 
-    @ViewBuilder
-    private var statusLabel: some View {
-        if store.selectedCount == 0 {
-            Text(store.trashedCount == 1 ? "1 photo" : "\(store.trashedCount) photos")
-                .foregroundStyle(.white.opacity(0.7))
-        } else {
-            Text("\(store.selectedCount) selected")
-                .foregroundStyle(.white.opacity(0.85))
-        }
-    }
+private struct FolderPicker: View {
+    @Environment(PhotoStore.self) private var store
 
-    private var barFill: Color {
-        Theme.canvas
-    }
-
-    private var trashButton: some View {
-        Button {
-            if store.mode == .trash {
-                store.cancel()
-            } else {
-                store.openTrash()
-            }
-        } label: {
-            HStack(spacing: 5) {
-                Image(systemName: store.mode == .trash ? "trash.fill" : "trash")
-                    .font(.system(size: 12, weight: .semibold))
-                if store.trashedCount > 0 {
-                    Text("\(store.trashedCount)")
-                        .font(.system(size: 11, weight: .semibold))
-                        .monospacedDigit()
+    var body: some View {
+        Menu {
+            Picker("Workspace", selection: workspaceBinding) {
+                ForEach(WorkspaceMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
                 }
             }
-            .padding(.horizontal, 12)
+            .pickerStyle(.inline)
+            .labelsHidden()
+        } label: {
+            HStack(spacing: 5) {
+                Text(store.mode.title)
+                    .font(.system(size: 14, weight: .semibold))
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 8)
             .frame(height: BarControl.height)
-            .foregroundStyle(store.mode == .trash ? Theme.accent : .white)
-            .background(Theme.surface, in: BarControl.shape)
-            .contentShape(BarControl.shape)
+            .contentShape(Rectangle())
         }
-        .buttonStyle(FillHitButtonStyle())
-        .help("Recently Deleted")
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .buttonStyle(.plain)
+        .fixedSize()
+        .help("Choose a working folder")
+    }
+
+    private var workspaceBinding: Binding<WorkspaceMode> {
+        Binding(
+            get: { store.mode },
+            set: { store.setWorkspace($0) }
+        )
     }
 }
 

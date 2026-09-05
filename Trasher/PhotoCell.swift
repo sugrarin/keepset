@@ -42,8 +42,11 @@ struct PhotoCell: View {
                 }
             }
             .overlay(alignment: .topTrailing) {
-                SelectionMarker(isSelected: isSelected)
-                    .padding(8)
+                SelectionHeart(
+                    isSelected: isSelected,
+                    isHovering: hovering && !isDragSelecting
+                )
+                .padding(8)
             }
             .overlay(alignment: .bottom) {
                 LoupeButton(onPreview: onPreview)
@@ -74,23 +77,17 @@ struct PhotoCell: View {
     }
 }
 
-private struct SelectionMarker: View {
+private struct SelectionHeart: View {
     let isSelected: Bool
+    let isHovering: Bool
 
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(isSelected ? Theme.accent : Theme.canvas.opacity(0.72))
-            Circle()
-                .strokeBorder(.white.opacity(isSelected ? 1 : 0.9), lineWidth: 1.6)
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-        }
-        .frame(width: 22, height: 22)
-        .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+        Image(systemName: isSelected ? "heart.fill" : "heart")
+            .font(.system(size: 16, weight: .semibold))
+            .foregroundStyle(isSelected ? Theme.accent : .white)
+            .shadow(color: .black.opacity(0.55), radius: 3, y: 1)
+            .opacity(isSelected || isHovering ? 1 : 0)
+            .accessibilityHidden(!isSelected && !isHovering)
     }
 }
 

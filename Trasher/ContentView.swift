@@ -28,12 +28,17 @@ struct ContentView: View {
                 .opacity(store.displayedPhotos.isEmpty ? 0 : 1)
 
                 if store.displayedPhotos.isEmpty, !store.isBusy {
-                    if store.mode == .trash {
+                    switch store.mode {
+                    case .trash:
                         EmptyTrashView()
-                    } else if store.photos.isEmpty {
+                    case .sandbox where store.photos.isEmpty:
                         EmptySandboxView {
                             Task { await store.resetSandbox() }
                         }
+                    case .cameraRoll:
+                        EmptyCameraRollView()
+                    case .sandbox:
+                        EmptyView()
                     }
                 }
             }
@@ -90,11 +95,11 @@ struct ContentView: View {
 
     private func handleReturn() {
         switch store.mode {
-        case .select where store.selectedCount > 0:
+        case .sandbox where store.selectedCount > 0:
             Task { await store.keep() }
         case .trash where store.selectedCount > 0:
             Task { await store.restoreSelected() }
-        case .select, .trash:
+        case .sandbox, .cameraRoll, .trash:
             break
         }
     }
@@ -109,6 +114,23 @@ private struct EmptyTrashView: View {
             Text("Trash is empty")
                 .font(.title3.weight(.medium))
             Text("Photos you drop while keeping will land here, so you can restore a mistake.")
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 360)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private struct EmptyCameraRollView: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "photo.on.rectangle")
+                .font(.system(size: 42, weight: .light))
+                .foregroundStyle(.white.opacity(0.55))
+            Text("Camera Roll")
+                .font(.title3.weight(.medium))
+            Text("The system photo library isn’t connected yet.")
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 360)

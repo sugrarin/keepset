@@ -1,9 +1,20 @@
 import Foundation
 import Observation
 
-enum WorkspaceMode: Equatable {
-    case select
+enum WorkspaceMode: String, Equatable, Hashable, CaseIterable, Identifiable {
+    case sandbox
+    case cameraRoll
     case trash
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .sandbox: "Sandbox"
+        case .cameraRoll: "Camera Roll"
+        case .trash: "Trash"
+        }
+    }
 }
 
 enum PhotoFilter: Equatable {
@@ -18,7 +29,7 @@ final class PhotoStore {
     var photos: [Photo] = []
     var trashedPhotos: [Photo] = []
     var selectedIDs: Set<Photo.ID> = []
-    var mode: WorkspaceMode = .select
+    var mode: WorkspaceMode = .sandbox
     var columnCount: Double = 5
     var filter: PhotoFilter = .all
     var isBusy = false
@@ -33,7 +44,7 @@ final class PhotoStore {
 
     var displayedPhotos: [Photo] {
         switch mode {
-        case .select:
+        case .sandbox:
             switch filter {
             case .all:
                 return photos
@@ -44,6 +55,8 @@ final class PhotoStore {
             }
         case .trash:
             return trashedPhotos
+        case .cameraRoll:
+            return []
         }
     }
 
@@ -81,15 +94,17 @@ final class PhotoStore {
     func cancel() {
         selectedIDs = []
         filter = .all
-        if mode == .trash {
-            mode = .select
-        }
+    }
+
+    func setWorkspace(_ next: WorkspaceMode) {
+        guard mode != next else { return }
+        selectedIDs = []
+        filter = .all
+        mode = next
     }
 
     func openTrash() {
-        selectedIDs = []
-        filter = .all
-        mode = .trash
+        setWorkspace(mode == .trash ? .sandbox : .trash)
     }
 
     func setFilter(_ next: PhotoFilter) {
@@ -118,7 +133,7 @@ final class PhotoStore {
     }
 
     func handleDragSelect(at photo: Photo) {
-        guard mode == .trash || (mode == .select && filter == .all) else { return }
+        guard mode == .trash || (mode == .sandbox && filter == .all) else { return }
         if dragAnchorID == nil {
             dragAnchorID = photo.id
             dragSnapshot = selectedIDs
@@ -158,13 +173,18 @@ final class PhotoStore {
     }
 
     func selectAll() {
-        let source = mode == .trash ? trashedPhotos : photos
-        selectedIDs = Set(source.map(\.id))
+        let pool: [Photo]
+        switch mode {
+        case .sandbox: pool = photos
+        case .trash: pool = trashedPhotos
+        case .cameraRoll: pool = []
+        }
+        selectedIDs = Set(pool.map(\.id))
         normalizeFilter()
     }
 
     func keep() async {
-        guard mode == .select, !selectedIDs.isEmpty, !isBusy else { return }
+        guard mode == .sandbox, !selectedIDs.isEmpty, !isBusy else { return }
         let toDelete = photos.filter { !selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
@@ -216,7 +236,7 @@ final class PhotoStore {
             try library.resetFromSeed()
             selectedIDs = []
             filter = .all
-            mode = .select
+            mode = .sandbox
             photos = try library.loadPhotos()
             trashedPhotos = try library.loadTrashedPhotos()
         } catch {
@@ -225,7 +245,7 @@ final class PhotoStore {
     }
 
     private func normalizeFilter() {
-        guard mode == .select, !isFilterEnabled(filter) else { return }
+        guard mode == .sandbox, !isFilterEnabled(filter) else { return }
         filter = .all
     }
 }
