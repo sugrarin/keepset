@@ -27,11 +27,13 @@ enum PhotoFilter: Equatable {
 @Observable
 final class PhotoStore {
     var photos: [Photo] = []
+    var cameraRollPhotos: [Photo] = []
     var trashedPhotos: [Photo] = []
     var selectedIDs: Set<Photo.ID> = []
     var mode: WorkspaceMode = .sandbox
     var columnCount: Double = 5
     var filter: PhotoFilter = .all
+    var cameraRollAccess: PhotoAccess = .unknown
     var isBusy = false
     var errorMessage: String?
     var directory: URL
@@ -42,28 +44,35 @@ final class PhotoStore {
     private var dragSnapshot: Set<Photo.ID> = []
     private var dragDidMove = false
 
+    var workingPhotos: [Photo] {
+        switch mode {
+        case .sandbox: photos
+        case .cameraRoll: cameraRollPhotos
+        case .trash: trashedPhotos
+        }
+    }
+
     var displayedPhotos: [Photo] {
         switch mode {
-        case .sandbox:
+        case .sandbox, .cameraRoll:
+            let pool = workingPhotos
             switch filter {
             case .all:
-                return photos
+                return pool
             case .keep:
-                return photos.filter { selectedIDs.contains($0.id) }
+                return pool.filter { selectedIDs.contains($0.id) }
             case .delete:
-                return photos.filter { !selectedIDs.contains($0.id) }
+                return pool.filter { !selectedIDs.contains($0.id) }
             }
         case .trash:
             return trashedPhotos
-        case .cameraRoll:
-            return []
         }
     }
 
     var selectedCount: Int { selectedIDs.count }
 
     var pendingDeleteCount: Int {
-        max(photos.count - selectedCount, 0)
+        max(workingPhotos.count - selectedCount, 0)
     }
 
     var columns: Int {
@@ -101,6 +110,9 @@ final class PhotoStore {
         selectedIDs = []
         filter = .all
         mode = next
+        if next == .cameraRoll {
+            Task { await loadCameraRoll() }
+        }
     }
 
     func openTrash() {
@@ -115,7 +127,7 @@ final class PhotoStore {
     func isFilterEnabled(_ filter: PhotoFilter) -> Bool {
         switch filter {
         case .all:
-            return !photos.isEmpty
+            return !workingPhotos.isEmpty
         case .keep:
             return selectedCount > 0
         case .delete:
@@ -133,7 +145,7 @@ final class PhotoStore {
     }
 
     func handleDragSelect(at photo: Photo) {
-        guard mode == .trash || (mode == .sandbox && filter == .all) else { return }
+        guard mode == .trash || ((mode == .sandbox || mode == .cameraRoll) && filter == .all) else { return }
         if dragAnchorID == nil {
             dragAnchorID = photo.id
             dragSnapshot = selectedIDs
@@ -173,31 +185,53 @@ final class PhotoStore {
     }
 
     func selectAll() {
-        let pool: [Photo]
-        switch mode {
-        case .sandbox: pool = photos
-        case .trash: pool = trashedPhotos
-        case .cameraRoll: pool = []
-        }
-        selectedIDs = Set(pool.map(\.id))
+        selectedIDs = Set(workingPhotos.map(\.id))
         normalizeFilter()
     }
 
     func keep() async {
-        guard mode == .sandbox, !selectedIDs.isEmpty, !isBusy else { return }
-        let toDelete = photos.filter { !selectedIDs.contains($0.id) }
+        guard mode == .sandbox || mode == .cameraRoll, !selectedIDs.isEmpty, !isBusy else { return }
+        let toDelete = workingPhotos.filter { !selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
         do {
             if !toDelete.isEmpty {
-                try library.moveToTrash(toDelete)
-                photos.removeAll { !selectedIDs.contains($0.id) }
-                trashedPhotos = try library.loadTrashedPhotos()
+                switch mode {
+                case .sandbox:
+                    try library.moveToTrash(toDelete)
+                    photos.removeAll { !selectedIDs.contains($0.id) }
+                    trashedPhotos = try library.loadTrashedPhotos()
+                case .cameraRoll:
+                    try await CameraRollLibrary.deletePhotos(toDelete)
+                    cameraRollPhotos.removeAll { !selectedIDs.contains($0.id) }
+                case .trash:
+                    break
+                }
             }
             selectedIDs = []
             filter = .all
+        } catch is CameraRollError {
+            return
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    func loadCameraRoll() async {
+        isBusy = true
+        defer { isBusy = false }
+        let access = await CameraRollLibrary.requestAccess()
+        cameraRollAccess = access
+        if access == .authorized {
+            cameraRollPhotos = await Task.detached(priority: .userInitiated) {
+                CameraRollLibrary.fetchPhotos()
+            }.value
+        } else {
+            cameraRollPhotos = []
+        }
+        if mode == .cameraRoll {
+            selectedIDs = selectedIDs.intersection(Set(cameraRollPhotos.map(\.id)))
+            normalizeFilter()
         }
     }
 
@@ -245,7 +279,7 @@ final class PhotoStore {
     }
 
     private func normalizeFilter() {
-        guard mode == .sandbox, !isFilterEnabled(filter) else { return }
+        guard mode == .sandbox || mode == .cameraRoll, !isFilterEnabled(filter) else { return }
         filter = .all
     }
 }

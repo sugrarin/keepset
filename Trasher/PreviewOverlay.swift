@@ -31,7 +31,7 @@ struct PreviewOverlay: View {
         }
         .ignoresSafeArea()
         .task(id: photo.id) {
-            image = await ThumbnailLoader.shared.image(for: photo.url, maxPixel: 2200)
+            image = await ThumbnailLoader.shared.image(for: photo, maxPixel: 2200)
         }
     }
 }

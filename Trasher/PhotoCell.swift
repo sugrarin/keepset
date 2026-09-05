@@ -72,7 +72,7 @@ struct PhotoCell: View {
             .animation(.easeOut(duration: 0.12), value: hovering)
             .animation(.easeOut(duration: 0.12), value: isSelected)
             .task(id: "\(photo.id)-\(maxPixel)") {
-                image = await ThumbnailLoader.shared.image(for: photo.url, maxPixel: maxPixel)
+                image = await ThumbnailLoader.shared.image(for: photo, maxPixel: maxPixel)
             }
     }
 }

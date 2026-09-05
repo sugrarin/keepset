@@ -27,7 +27,10 @@ struct ContentView: View {
                 )
                 .opacity(store.displayedPhotos.isEmpty ? 0 : 1)
 
-                if store.displayedPhotos.isEmpty, !store.isBusy {
+                if store.isBusy, store.displayedPhotos.isEmpty {
+                    ProgressView()
+                        .controlSize(.large)
+                } else if store.displayedPhotos.isEmpty {
                     switch store.mode {
                     case .trash:
                         EmptyTrashView()
@@ -36,7 +39,9 @@ struct ContentView: View {
                             Task { await store.resetSandbox() }
                         }
                     case .cameraRoll:
-                        EmptyCameraRollView()
+                        EmptyCameraRollView(access: store.cameraRollAccess) {
+                            openPhotosPrivacySettings()
+                        }
                     case .sandbox:
                         EmptyView()
                     }
@@ -83,6 +88,10 @@ struct ContentView: View {
         .onChange(of: store.filter) { _, _ in
             previewPhoto = nil
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            guard store.mode == .cameraRoll, store.cameraRollAccess != .authorized else { return }
+            Task { await store.loadCameraRoll() }
+        }
     }
 
     private func handleEscape() {
@@ -95,12 +104,24 @@ struct ContentView: View {
 
     private func handleReturn() {
         switch store.mode {
-        case .sandbox where store.selectedCount > 0:
+        case .sandbox where store.selectedCount > 0, .cameraRoll where store.selectedCount > 0:
             Task { await store.keep() }
         case .trash where store.selectedCount > 0:
             Task { await store.restoreSelected() }
         case .sandbox, .cameraRoll, .trash:
             break
+        }
+    }
+
+    private func openPhotosPrivacySettings() {
+        let candidates = [
+            "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Photos",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_Photos"
+        ]
+        for raw in candidates {
+            if let url = URL(string: raw), NSWorkspace.shared.open(url) {
+                return
+            }
         }
     }
 }
@@ -123,6 +144,9 @@ private struct EmptyTrashView: View {
 }
 
 private struct EmptyCameraRollView: View {
+    let access: PhotoAccess
+    let onOpenSettings: () -> Void
+
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "photo.on.rectangle")
@@ -130,12 +154,30 @@ private struct EmptyCameraRollView: View {
                 .foregroundStyle(.white.opacity(0.55))
             Text("Camera Roll")
                 .font(.title3.weight(.medium))
-            Text("The system photo library isn’t connected yet.")
+            Text(copy)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: 360)
+            if access == .denied {
+                Button("Open System Settings", action: onOpenSettings)
+                    .buttonStyle(.borderedProminent)
+                    .tint(Theme.accent)
+                    .foregroundStyle(Theme.onAccent)
+                    .padding(.top, 6)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var copy: String {
+        switch access {
+        case .denied:
+            "Trasher needs access to Photos to show Camera Roll."
+        case .authorized:
+            "Camera Roll is empty."
+        case .unknown:
+            "Checking Photos access…"
+        }
     }
 }
 
@@ -154,6 +196,7 @@ private struct EmptySandboxView: View {
             Button("Reset Demo Photos", action: onReset)
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.accent)
+                .foregroundStyle(Theme.onAccent)
                 .padding(.top, 6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

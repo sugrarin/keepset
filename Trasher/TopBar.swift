@@ -17,7 +17,7 @@ struct TopBar: View {
         HStack(spacing: 12) {
             HStack(spacing: 12) {
                 gridSizeSlider
-                if store.mode == .sandbox {
+                if store.mode == .sandbox || store.mode == .cameraRoll {
                     FilterTabs()
                 }
                 Spacer(minLength: 0)
@@ -43,30 +43,36 @@ struct TopBar: View {
     }
 
     private var gridSizeSlider: some View {
-        @Bindable var store = store
-        return HStack(spacing: 8) {
-            Image(systemName: "square.grid.2x2")
-                .font(.system(size: 12, weight: .semibold))
+        HStack(spacing: 8) {
+            Image(systemName: "square.grid.4x3.fill")
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.7))
-            Slider(value: $store.columnCount, in: 3...10, step: 1)
+            Slider(value: invertedColumnCount, in: 3...10, step: 1)
                 .controlSize(.small)
                 .frame(width: 140)
                 .tint(Theme.accent)
-            Image(systemName: "square.grid.4x3.fill")
-                .font(.system(size: 11, weight: .semibold))
+            Image(systemName: "square.grid.2x2")
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.7))
         }
     }
 
+    private var invertedColumnCount: Binding<Double> {
+        Binding(
+            get: { 13 - store.columnCount },
+            set: { store.columnCount = 13 - $0 }
+        )
+    }
+
     @ViewBuilder
     private var trailingActions: some View {
-        if store.mode == .sandbox, store.selectedCount > 0 {
+        if store.mode == .sandbox || store.mode == .cameraRoll, store.selectedCount > 0 {
             chromeButton("Cancel", fill: Theme.surface) {
                 store.cancel()
             }
             commitButton
         } else if store.mode == .trash, store.selectedCount > 0 {
-            chromeButton("Restore", fill: Theme.accent, emphasized: true) {
+            chromeButton("Restore", fill: Theme.accent, foreground: Theme.onAccent, emphasized: true) {
                 Task { await store.restoreSelected() }
             }
             .disabled(store.isBusy)
@@ -93,7 +99,7 @@ struct TopBar: View {
             }
             .padding(.horizontal, 14)
             .frame(height: BarControl.height)
-            .foregroundStyle(.white)
+            .foregroundStyle(Theme.onAccent)
             .background(Theme.accent, in: BarControl.shape)
             .contentShape(BarControl.shape)
         }
@@ -167,7 +173,7 @@ private struct FilterTabs: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            tab(.all, title: "All", count: store.photos.count)
+            tab(.all, title: "All", count: store.workingPhotos.count)
             tab(.keep, title: "Keep", count: store.selectedCount)
             tab(.delete, title: "Delete", count: store.pendingDeleteCount)
         }

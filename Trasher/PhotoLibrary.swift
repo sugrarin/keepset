@@ -113,9 +113,9 @@ struct FolderPhotoLibrary: Sendable {
         let fm = FileManager.default
         try fm.createDirectory(at: trashDirectory, withIntermediateDirectories: true)
         for photo in photos {
-            guard canMutate(photo.url) else { continue }
+            guard let url = photo.fileURL, canMutate(url) else { continue }
             let destination = uniqueURL(in: trashDirectory, named: photo.filename)
-            try fm.moveItem(at: photo.url, to: destination)
+            try fm.moveItem(at: url, to: destination)
         }
     }
 
@@ -123,9 +123,9 @@ struct FolderPhotoLibrary: Sendable {
         let fm = FileManager.default
         try fm.createDirectory(at: directory, withIntermediateDirectories: true)
         for photo in photos {
-            guard canMutate(photo.url) else { continue }
+            guard let url = photo.fileURL, canMutate(url) else { continue }
             let destination = uniqueURL(in: directory, named: photo.filename)
-            try fm.moveItem(at: photo.url, to: destination)
+            try fm.moveItem(at: url, to: destination)
         }
     }
 
@@ -134,8 +134,8 @@ struct FolderPhotoLibrary: Sendable {
         guard fm.fileExists(atPath: trashDirectory.path) else { return }
         let trashed = try loadTrashedPhotos()
         for photo in trashed {
-            guard canMutate(photo.url) else { continue }
-            try fm.removeItem(at: photo.url)
+            guard let url = photo.fileURL, canMutate(url) else { continue }
+            try fm.removeItem(at: url)
         }
     }
 
@@ -147,7 +147,9 @@ struct FolderPhotoLibrary: Sendable {
         try fm.createDirectory(at: directory, withIntermediateDirectories: true)
         let existing = try loadPhotos()
         for photo in existing {
-            try? fm.removeItem(at: photo.url)
+            if let url = photo.fileURL {
+                try? fm.removeItem(at: url)
+            }
         }
         try? emptyTrash()
         try WorkingPhotosDirectory.copyImages(from: seed, to: directory)
@@ -169,7 +171,7 @@ struct FolderPhotoLibrary: Sendable {
             guard values?.isRegularFile != false else { return nil }
             return Photo(
                 id: url.path,
-                url: url,
+                source: .file(url),
                 filename: url.lastPathComponent,
                 modifiedAt: values?.contentModificationDate ?? .distantPast
             )
