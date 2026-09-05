@@ -41,7 +41,8 @@ final class PhotoStore {
 
     private var library: FolderPhotoLibrary
     private var dragAnchorID: Photo.ID?
-    private var dragPaintedIDs: Set<Photo.ID> = []
+    private var dragSnapshot: Set<Photo.ID> = []
+    private var dragSelects = true
     private var dragDidMove = false
 
     var workingPhotos: [Photo] {
@@ -148,19 +149,17 @@ final class PhotoStore {
         guard mode == .trash || ((mode == .sandbox || mode == .cameraRoll) && filter == .all) else { return }
         if dragAnchorID == nil {
             dragAnchorID = photo.id
-            dragPaintedIDs = []
+            dragSnapshot = selectedIDs
+            dragSelects = !selectedIDs.contains(photo.id)
             dragDidMove = false
             return
         }
         if photo.id != dragAnchorID {
             dragDidMove = true
             isDragSelecting = true
-            if let anchorID = dragAnchorID {
-                paintFlag(anchorID)
-            }
         }
         guard dragDidMove else { return }
-        paintFlag(photo.id)
+        applyDragRange(to: photo.id)
     }
 
     func endDragSelect() {
@@ -169,20 +168,27 @@ final class PhotoStore {
             toggle(photo)
         }
         dragAnchorID = nil
-        dragPaintedIDs = []
+        dragSnapshot = []
+        dragSelects = true
         dragDidMove = false
         isDragSelecting = false
         normalizeFilter()
     }
 
-    private func paintFlag(_ id: Photo.ID) {
-        guard !dragPaintedIDs.contains(id) else { return }
-        dragPaintedIDs.insert(id)
-        if selectedIDs.contains(id) {
-            selectedIDs.remove(id)
-        } else {
-            selectedIDs.insert(id)
+    private func applyDragRange(to currentID: Photo.ID) {
+        guard let anchorID = dragAnchorID,
+              let start = displayedPhotos.firstIndex(where: { $0.id == anchorID }),
+              let end = displayedPhotos.firstIndex(where: { $0.id == currentID })
+        else { return }
+        var next = dragSnapshot
+        for photo in displayedPhotos[min(start, end)...max(start, end)] {
+            if dragSelects {
+                next.insert(photo.id)
+            } else {
+                next.remove(photo.id)
+            }
         }
+        selectedIDs = next
     }
 
     func selectAll() {
