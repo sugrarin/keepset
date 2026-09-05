@@ -6,7 +6,7 @@ struct PreviewOverlay: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.82)
+            Theme.canvas.opacity(0.88)
 
             VStack(spacing: 12) {
                 Group {

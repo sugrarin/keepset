@@ -24,7 +24,7 @@ struct TopBar: View {
                     .font(.system(size: 11, weight: .semibold))
                     .padding(.horizontal, 10)
                     .frame(height: BarControl.height)
-                    .background(.white.opacity(0.12), in: BarControl.shape)
+                    .background(Theme.surface, in: BarControl.shape)
                     .foregroundStyle(.white.opacity(0.8))
                 if store.mode == .select {
                     FilterTabs()
@@ -38,20 +38,20 @@ struct TopBar: View {
             if store.mode != .select || store.selectedCount > 0 {
                 chromeButton(
                     store.mode == .trash ? "Back" : "Cancel",
-                    fill: .white.opacity(0.08)
+                    fill: Theme.surface
                 ) {
                     store.cancel()
                 }
             }
 
             if store.mode == .trash, store.selectedCount > 0 {
-                chromeButton("Restore", fill: .white, foreground: .black, emphasized: true) {
+                chromeButton("Restore", fill: Theme.accent, emphasized: true) {
                     Task { await store.restoreSelected() }
                 }
                 .disabled(store.isBusy)
                 .allowsHitTesting(!store.isBusy)
             } else if store.mode == .trash, store.trashedCount > 0 {
-                chromeButton("Empty Trash", fill: .white.opacity(0.08)) {
+                chromeButton("Empty Trash", fill: Theme.surface) {
                     Task { await store.emptyTrash() }
                 }
                 .disabled(store.isBusy)
@@ -71,7 +71,7 @@ struct TopBar: View {
                 .fill(barFill)
         }
         .overlay(alignment: .bottom) {
-            Divider().opacity(0.35)
+            Divider().opacity(0.12)
         }
     }
 
@@ -84,7 +84,7 @@ struct TopBar: View {
             Slider(value: $store.columnCount, in: 3...10, step: 1)
                 .controlSize(.small)
                 .frame(width: 140)
-                .tint(.white.opacity(0.85))
+                .tint(Theme.accent)
             Image(systemName: "square.grid.4x3.fill")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.white.opacity(0.7))
@@ -104,8 +104,8 @@ struct TopBar: View {
             }
             .padding(.horizontal, 14)
             .frame(height: BarControl.height)
-            .foregroundStyle(.black)
-            .background(.white, in: BarControl.shape)
+            .foregroundStyle(.white)
+            .background(Theme.accent, in: BarControl.shape)
             .contentShape(BarControl.shape)
         }
         .buttonStyle(FillHitButtonStyle())
@@ -144,12 +144,7 @@ struct TopBar: View {
     }
 
     private var barFill: Color {
-        switch store.mode {
-        case .trash:
-            Color(red: 0.14, green: 0.08, blue: 0.06)
-        case .select:
-            Color.black
-        }
+        Theme.canvas
     }
 
     private var trashButton: some View {
@@ -171,10 +166,8 @@ struct TopBar: View {
             }
             .padding(.horizontal, 12)
             .frame(height: BarControl.height)
-            .background(
-                store.mode == .trash ? Color.white.opacity(0.16) : Color.white.opacity(0.08),
-                in: BarControl.shape
-            )
+            .foregroundStyle(store.mode == .trash ? Theme.accent : .white)
+            .background(Theme.surface, in: BarControl.shape)
             .contentShape(BarControl.shape)
         }
         .buttonStyle(FillHitButtonStyle())
@@ -193,7 +186,7 @@ private struct FilterTabs: View {
         }
         .padding(3)
         .frame(height: BarControl.height)
-        .background(.white.opacity(0.08), in: BarControl.shape)
+        .background(Theme.surface, in: BarControl.shape)
     }
 
     private func tab(_ filter: PhotoFilter, title: String, count: Int) -> some View {
@@ -208,7 +201,7 @@ private struct FilterTabs: View {
                 .padding(.horizontal, 12)
                 .frame(maxHeight: .infinity)
                 .foregroundStyle(.white.opacity(selected ? 0.95 : 0.72))
-                .background(selected ? Color.white.opacity(0.16) : Color.clear, in: Capsule())
+                .background(selected ? Theme.canvas : Color.clear, in: Capsule())
                 .contentShape(Capsule())
                 .opacity(enabled ? 1 : 0.38)
         }

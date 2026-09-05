@@ -22,7 +22,7 @@ struct PhotoCell: View {
     }
 
     var body: some View {
-        Color.black
+        Theme.canvas
             .aspectRatio(1, contentMode: .fit)
             .overlay {
                 if let image {
@@ -31,14 +31,14 @@ struct PhotoCell: View {
                         .scaledToFill()
                 } else {
                     Rectangle()
-                        .fill(.white.opacity(0.06))
+                        .fill(Theme.surface)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .overlay {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .strokeBorder(.white, lineWidth: 4)
+                        .strokeBorder(Theme.accent, lineWidth: 4)
                 }
             }
             .overlay(alignment: .topTrailing) {
@@ -80,7 +80,7 @@ private struct SelectionMarker: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(isSelected ? Color(red: 0.22, green: 0.72, blue: 0.42) : Color.black.opacity(0.38))
+                .fill(isSelected ? Theme.accent : Theme.canvas.opacity(0.72))
             Circle()
                 .strokeBorder(.white.opacity(isSelected ? 1 : 0.9), lineWidth: 1.6)
             if isSelected {

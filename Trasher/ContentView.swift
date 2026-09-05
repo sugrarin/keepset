@@ -10,7 +10,7 @@ struct ContentView: View {
             TopBar()
 
             ZStack {
-                Color.black
+                Theme.canvas
 
                 PhotoGridView(
                     photos: store.displayedPhotos,
@@ -39,7 +39,7 @@ struct ContentView: View {
             }
             .clipped()
         }
-        .background(Color.black)
+        .background(Theme.canvas)
         .overlay {
             if let previewPhoto {
                 PreviewOverlay(photo: previewPhoto)
@@ -131,6 +131,7 @@ private struct EmptySandboxView: View {
                 .foregroundStyle(.secondary)
             Button("Reset Demo Photos", action: onReset)
                 .buttonStyle(.borderedProminent)
+                .tint(Theme.accent)
                 .padding(.top, 6)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -152,12 +153,12 @@ private final class WindowHookView: NSView {
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden
         window.styleMask.insert(.fullSizeContentView)
-        window.backgroundColor = .black
+        window.backgroundColor = Theme.canvasNS
         window.isMovableByWindowBackground = false
         window.minSize = NSSize(width: 760, height: 520)
         if let titlebar = window.standardWindowButton(.closeButton)?.superview {
             titlebar.wantsLayer = true
-            titlebar.layer?.backgroundColor = NSColor.black.cgColor
+            titlebar.layer?.backgroundColor = Theme.canvasNS.cgColor
         }
     }
 }
