@@ -172,7 +172,7 @@ private struct EmptyCameraRollView: View {
     private var copy: String {
         switch access {
         case .denied:
-            "Trasher needs access to Photos to show Camera Roll."
+            "Keepset needs access to Photos to show Camera Roll."
         case .authorized:
             "Camera Roll is empty."
         case .unknown:

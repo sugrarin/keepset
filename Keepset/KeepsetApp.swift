@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @main
-struct TrasherApp: App {
+struct KeepsetApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var store = PhotoStore()
 

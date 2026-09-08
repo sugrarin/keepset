@@ -1,8 +1,8 @@
-# Trasher
+# Keepset
 
 macOS-приложение для разбора папки с фото: отмечаешь то, что хочешь оставить, остальное уходит во внутреннюю корзину и оттуда его можно вернуть.
 
-Рабочее имя продукта в бандле — **Trasher** (`com.trasher.app`). Репозиторий называется `photo-keeper`. Сейчас это песочница: приложение крутится вокруг локальной папки `photos/`, а не вокруг системной Фототеки.
+Рабочее имя продукта в бандле — **Keepset** (`com.keepset.app`). Репозиторий называется `keepset`. Сейчас это песочница плюс Camera Roll: приложение крутится вокруг локальной папки `photos/` и системной Фототеки.
 
 Версия: `0.1.0`. Платформа: macOS 14+, Swift 6, SwiftUI + AppKit.
 
@@ -68,9 +68,9 @@ photos/.Trash/          ← recently deleted, не системная Корзи
 
 `WorkingPhotosDirectory.resolve()` ищет папку в таком порядке:
 
-1. Переменная окружения `TRASHER_PHOTOS_DIR`. В Xcode-схеме она равна `$(SRCROOT)/photos`, поэтому из Xcode приложение всегда работает с репозиторной папкой.
+1. Переменная окружения `KEEPSET_PHOTOS_DIR`. В Xcode-схеме она равна `$(SRCROOT)/photos`, поэтому из Xcode приложение всегда работает с репозиторной папкой.
 2. Папка `photos/` где-то рядом с cwd или бандлом, но **не внутри** `.app`.
-3. Иначе `~/Library/Application Support/Trasher/photos`. Если она пустая, туда копируется seed из ресурсов бандла.
+3. Иначе `~/Library/Application Support/Keepset/photos`. Если она пустая, туда копируется seed из ресурсов бандла.
 
 Seed — те же демо-файлы из `photos/`, они ещё и кладутся в бандл как resources. Reset Demo Photos стирает текущую папку и `.Trash`, затем копирует seed заново.
 
@@ -91,7 +91,7 @@ Restore делает обратный `moveItem` в `photos/`. Empty Trash уж�
 Слой тонкий: нет SwiftData, нет сети. Песочница читает папку с диска, Camera Roll — PhotoKit. Состояние живёт в одном `@Observable` сторе, UI — набор SwiftUI-вью.
 
 ```
-TrasherApp
+KeepsetApp
   └─ PhotoStore (environment)
        └─ ContentView
             ├─ TopBar
@@ -101,7 +101,7 @@ TrasherApp
 
 | Файл | Роль |
 |---|---|
-| `TrasherApp.swift` | Точка входа, окно, меню Sandbox, `PhotoStore` как `@State` |
+| `KeepsetApp.swift` | Точка входа, окно, меню Sandbox, `PhotoStore` как `@State` |
 | `PhotoStore.swift` | Режимы, фильтр All/Keep/Delete, выбор, жесты диапазона, keep/restore |
 | `PhotoLibrary.swift` | Резолв папки, чтение, move в `.Trash` / обратно, reset seed |
 | `CameraRollLibrary.swift` | Доступ к Фототеке, fetch PHAsset, удаление в Recently Deleted |
@@ -154,17 +154,17 @@ Drag-select — интервал в порядке сетки. На `pointer dow
 
 ## Сборка и запуск
 
-Проект генерируется/описан в `project.yml` (XcodeGen), в репозитории уже лежит `Trasher.xcodeproj`.
+Проект генерируется/описан в `project.yml` (XcodeGen), в репозитории уже лежит `Keepset.xcodeproj`.
 
 ```
-xcodebuild -project Trasher.xcodeproj -scheme Trasher -configuration Debug -derivedDataPath build build
+xcodebuild -project Keepset.xcodeproj -scheme Keepset -configuration Debug -derivedDataPath build build
 ```
 
-Единственный Debug-бандл — `build/Build/Products/Debug/Trasher.app`. DerivedData в `~/Library/Developer/Xcode` для этого проекта не используется, чтобы Spotlight/Alfred не открывали старую копию.
+Единственный Debug-бандл — `build/Build/Products/Debug/Keepset.app`. DerivedData в `~/Library/Developer/Xcode` для этого проекта не используется, чтобы Spotlight/Alfred не открывали старую копию.
 
-Схема подставляет `TRASHER_PHOTOS_DIR=$(SRCROOT)/photos`. Если открыть `.app` без этой переменной, приложение либо найдёт соседний `photos/`, либо уйдёт в Application Support.
+Схема подставляет `KEEPSET_PHOTOS_DIR=$(SRCROOT)/photos`. Если открыть `.app` без этой переменной, приложение либо найдёт соседний `photos/`, либо уйдёт в Application Support.
 
-Подпись локальная (`CODE_SIGN_IDENTITY: "-"`), hardened runtime включён, entitlements пустые.
+Подпись локальная (`CODE_SIGN_IDENTITY: "-"`), hardened runtime включён, в entitlements — доступ к Фототеке.
 
 ---
 

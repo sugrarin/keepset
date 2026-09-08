@@ -1,0 +1,367 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0236870031A0A59CBBEB3A82 /* photos in Resources */ = {isa = PBXBuildFile; fileRef = FD42635FA44A4C8F6F5539DC /* photos */; };
+		2D91614BE3AE5DA876F19E59 /* PreviewOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA98FA0FAD81AE8D502CBA78 /* PreviewOverlay.swift */; };
+		386418C80303A6C00D9FCBCB /* CameraRollLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */; };
+		3BF344A7273A81BAC9121BDC /* ThumbnailLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1976260F852991A8990722 /* ThumbnailLoader.swift */; };
+		569847E5C8035CF17EA899D6 /* PhotoGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0509B54DB3DDC3CA10BAF3 /* PhotoGridView.swift */; };
+		663585E00CFF9F517E6C1C25 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79AADB383ACB0AE70307429 /* Theme.swift */; };
+		689A6EF7A5D158E38C7495D6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0FC711248D9B602FFF749052 /* Assets.xcassets */; };
+		6B9D4D83C71B8F2F0052A156 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C83866CFBB3CEFD94D3FF1 /* ContentView.swift */; };
+		73237A89CF20E7FE14D76C22 /* TopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD752B465ECBF3C16630856 /* TopBar.swift */; };
+		8247EC26EA6050029F48F0BF /* KeepsetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */; };
+		89BE6D0D071AD207720EED03 /* PhotoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCCF4AA3154B23FD98713A4 /* PhotoStore.swift */; };
+		BDD6E3A4EBE9C0828FC44A6C /* PhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */; };
+		BEDF81CDFCED4D546D2A8DBC /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B390205C039C743924283F7 /* PhotoCell.swift */; };
+		D551DE08151B7DD0BAACF3F7 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D67A324726828DC9AA9001F /* Photo.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0FC711248D9B602FFF749052 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4B390205C039C743924283F7 /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
+		5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRollLibrary.swift; sourceTree = "<group>"; };
+		5E0509B54DB3DDC3CA10BAF3 /* PhotoGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGridView.swift; sourceTree = "<group>"; };
+		638550F872EADB57AA06CDAE /* Keepset.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keepset.entitlements; sourceTree = "<group>"; };
+		65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibrary.swift; sourceTree = "<group>"; };
+		99534D1BD02317E2726781B0 /* Keepset.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Keepset.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D67A324726828DC9AA9001F /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		A79AADB383ACB0AE70307429 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		AAD752B465ECBF3C16630856 /* TopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBar.swift; sourceTree = "<group>"; };
+		D1C83866CFBB3CEFD94D3FF1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		DA98FA0FAD81AE8D502CBA78 /* PreviewOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewOverlay.swift; sourceTree = "<group>"; };
+		DCCCF4AA3154B23FD98713A4 /* PhotoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoStore.swift; sourceTree = "<group>"; };
+		E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepsetApp.swift; sourceTree = "<group>"; };
+		FD1976260F852991A8990722 /* ThumbnailLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailLoader.swift; sourceTree = "<group>"; };
+		FD42635FA44A4C8F6F5539DC /* photos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = photos; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		214C3B30265EAF7EEAA2C600 /* Keepset */ = {
+			isa = PBXGroup;
+			children = (
+				0FC711248D9B602FFF749052 /* Assets.xcassets */,
+				5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */,
+				D1C83866CFBB3CEFD94D3FF1 /* ContentView.swift */,
+				638550F872EADB57AA06CDAE /* Keepset.entitlements */,
+				E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */,
+				9D67A324726828DC9AA9001F /* Photo.swift */,
+				4B390205C039C743924283F7 /* PhotoCell.swift */,
+				5E0509B54DB3DDC3CA10BAF3 /* PhotoGridView.swift */,
+				65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */,
+				DCCCF4AA3154B23FD98713A4 /* PhotoStore.swift */,
+				DA98FA0FAD81AE8D502CBA78 /* PreviewOverlay.swift */,
+				A79AADB383ACB0AE70307429 /* Theme.swift */,
+				FD1976260F852991A8990722 /* ThumbnailLoader.swift */,
+				AAD752B465ECBF3C16630856 /* TopBar.swift */,
+			);
+			path = Keepset;
+			sourceTree = "<group>";
+		};
+		392C48F744BBC77923F0524E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				99534D1BD02317E2726781B0 /* Keepset.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		424E0743F0EFE1D2E22A4954 = {
+			isa = PBXGroup;
+			children = (
+				FD42635FA44A4C8F6F5539DC /* photos */,
+				214C3B30265EAF7EEAA2C600 /* Keepset */,
+				392C48F744BBC77923F0524E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A6A8A1AB672AD74D2B8FF524 /* Keepset */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E4F06C4259482759589F367 /* Build configuration list for PBXNativeTarget "Keepset" */;
+			buildPhases = (
+				4684D3A60A290D319D46AB53 /* Sources */,
+				36D6441F3B4E6A731A478874 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Keepset;
+			packageProductDependencies = (
+			);
+			productName = Keepset;
+			productReference = 99534D1BD02317E2726781B0 /* Keepset.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E251AC5AAEE235535AB59BED /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 864764B457DC9422C30C7ED0 /* Build configuration list for PBXProject "Keepset" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 424E0743F0EFE1D2E22A4954;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 392C48F744BBC77923F0524E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A6A8A1AB672AD74D2B8FF524 /* Keepset */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		36D6441F3B4E6A731A478874 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				689A6EF7A5D158E38C7495D6 /* Assets.xcassets in Resources */,
+				0236870031A0A59CBBEB3A82 /* photos in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4684D3A60A290D319D46AB53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				386418C80303A6C00D9FCBCB /* CameraRollLibrary.swift in Sources */,
+				6B9D4D83C71B8F2F0052A156 /* ContentView.swift in Sources */,
+				8247EC26EA6050029F48F0BF /* KeepsetApp.swift in Sources */,
+				D551DE08151B7DD0BAACF3F7 /* Photo.swift in Sources */,
+				BEDF81CDFCED4D546D2A8DBC /* PhotoCell.swift in Sources */,
+				569847E5C8035CF17EA899D6 /* PhotoGridView.swift in Sources */,
+				BDD6E3A4EBE9C0828FC44A6C /* PhotoLibrary.swift in Sources */,
+				89BE6D0D071AD207720EED03 /* PhotoStore.swift in Sources */,
+				2D91614BE3AE5DA876F19E59 /* PreviewOverlay.swift in Sources */,
+				663585E00CFF9F517E6C1C25 /* Theme.swift in Sources */,
+				3BF344A7273A81BAC9121BDC /* ThumbnailLoader.swift in Sources */,
+				73237A89CF20E7FE14D76C22 /* TopBar.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		49527F8BF472428F18DE154F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Keepset/Keepset.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Keepset;
+				INFOPLIST_KEY_CFBundleName = Keepset;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Keepset keeps the photos you select and moves the rest to Recently Deleted.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.keepset.app;
+				PRODUCT_NAME = Keepset;
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+			};
+			name = Debug;
+		};
+		B84165F3BDC549C3D8CD05F8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		DB6DAD5CFDE49D3BFB57A286 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		E4F6E25220568BC053721FBC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Keepset/Keepset.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Keepset;
+				INFOPLIST_KEY_CFBundleName = Keepset;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSHighResolutionCapable = YES;
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Keepset keeps the photos you select and moves the rest to Recently Deleted.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.keepset.app;
+				PRODUCT_NAME = Keepset;
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1E4F06C4259482759589F367 /* Build configuration list for PBXNativeTarget "Keepset" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				49527F8BF472428F18DE154F /* Debug */,
+				E4F6E25220568BC053721FBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		864764B457DC9422C30C7ED0 /* Build configuration list for PBXProject "Keepset" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B84165F3BDC549C3D8CD05F8 /* Debug */,
+				DB6DAD5CFDE49D3BFB57A286 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E251AC5AAEE235535AB59BED /* Project object */;
+}

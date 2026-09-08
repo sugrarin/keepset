@@ -22,7 +22,7 @@ enum WorkingPhotosDirectory {
     static func resolve() -> URL {
         let fm = FileManager.default
 
-        if let env = ProcessInfo.processInfo.environment["TRASHER_PHOTOS_DIR"], !env.isEmpty {
+        if let env = ProcessInfo.processInfo.environment["KEEPSET_PHOTOS_DIR"], !env.isEmpty {
             let url = URL(fileURLWithPath: env, isDirectory: true)
             try? fm.createDirectory(at: url, withIntermediateDirectories: true)
             return url
@@ -46,7 +46,7 @@ enum WorkingPhotosDirectory {
         }
 
         let support = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Trasher/photos", isDirectory: true)
+            .appendingPathComponent("Keepset/photos", isDirectory: true)
         try? fm.createDirectory(at: support, withIntermediateDirectories: true)
         if isEmpty(support), let seed = seedURL {
             try? copyImages(from: seed, to: support)

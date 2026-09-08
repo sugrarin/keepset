@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3E46295326921895EF1B32EE"
-               BuildableName = "Trasher.app"
-               BlueprintName = "Trasher"
-               ReferencedContainer = "container:Trasher.xcodeproj">
+               BlueprintIdentifier = "A6A8A1AB672AD74D2B8FF524"
+               BuildableName = "Keepset.app"
+               BlueprintName = "Keepset"
+               ReferencedContainer = "container:Keepset.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3E46295326921895EF1B32EE"
-            BuildableName = "Trasher.app"
-            BlueprintName = "Trasher"
-            ReferencedContainer = "container:Trasher.xcodeproj">
+            BlueprintIdentifier = "A6A8A1AB672AD74D2B8FF524"
+            BuildableName = "Keepset.app"
+            BlueprintName = "Keepset"
+            ReferencedContainer = "container:Keepset.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -44,7 +44,7 @@
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "TRASHER_PHOTOS_DIR"
+            key = "KEEPSET_PHOTOS_DIR"
             value = "$(SRCROOT)/photos"
             isEnabled = "YES">
          </EnvironmentVariable>
@@ -64,17 +64,17 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3E46295326921895EF1B32EE"
-            BuildableName = "Trasher.app"
-            BlueprintName = "Trasher"
-            ReferencedContainer = "container:Trasher.xcodeproj">
+            BlueprintIdentifier = "A6A8A1AB672AD74D2B8FF524"
+            BuildableName = "Keepset.app"
+            BlueprintName = "Keepset"
+            ReferencedContainer = "container:Keepset.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "TRASHER_PHOTOS_DIR"
+            key = "KEEPSET_PHOTOS_DIR"
             value = "$(SRCROOT)/photos"
             isEnabled = "YES">
          </EnvironmentVariable>
@@ -90,17 +90,17 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3E46295326921895EF1B32EE"
-            BuildableName = "Trasher.app"
-            BlueprintName = "Trasher"
-            ReferencedContainer = "container:Trasher.xcodeproj">
+            BlueprintIdentifier = "A6A8A1AB672AD74D2B8FF524"
+            BuildableName = "Keepset.app"
+            BlueprintName = "Keepset"
+            ReferencedContainer = "container:Keepset.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "TRASHER_PHOTOS_DIR"
+            key = "KEEPSET_PHOTOS_DIR"
             value = "$(SRCROOT)/photos"
             isEnabled = "YES">
          </EnvironmentVariable>
