@@ -68,13 +68,16 @@ photos/.Trash/          ← recently deleted, не системная Корзи
 
 ### Куда указывает рабочая папка
 
-`WorkingPhotosDirectory.resolve()` ищет папку в таком порядке:
+`WorkingPhotosDirectory.resolve()` выбирает папку так:
 
-1. Переменная окружения `KEEPSET_PHOTOS_DIR`. В Xcode-схеме она равна `$(SRCROOT)/photos`, поэтому из Xcode приложение всегда работает с репозиторной папкой.
-2. Папка `photos/` где-то рядом с cwd или бандлом, но **не внутри** `.app`.
-3. Иначе `~/Library/Application Support/Keepset/photos`. Если она пустая, туда копируется seed из ресурсов бандла.
+1. Переменная окружения `KEEPSET_PHOTOS_DIR`. В Xcode-схеме она равна `$(SRCROOT)/photos`, поэтому из Xcode приложение всегда работает с репозиторной папкой. Если такой папки нет, приложение создаёт её и помечает маркером.
+2. Иначе `~/Library/Application Support/Keepset/photos`. Если она пустая, туда копируется seed из ресурсов бандла.
+
+Соседние папки `photos/` приложение больше не ищет. Раньше оно поднималось вверх от cwd и бандла, а на регистронезависимой APFS под это имя подходит и `~/Photos`.
 
 Seed — те же демо-файлы из `photos/`, они ещё и кладутся в бандл как resources. Reset Demo Photos стирает текущую папку и `.Trash`, затем копирует seed заново.
+
+Reset удаляет файлы навсегда, поэтому работает только в папке с маркером `.keepset-sandbox`. Его ставит само приложение (Application Support или созданная им папка из env), у репозиторной `photos/` он лежит в git. В папке без маркера Reset показывает ошибку и ничего не трогает.
 
 Файлы внутри `.app` приложение не двигает и не удаляет (`canMutate`).
 
@@ -172,7 +175,7 @@ xcodebuild -project Keepset.xcodeproj -scheme Keepset -configuration Debug -deri
 
 Единственный Debug-бандл — `build/Build/Products/Debug/Keepset.app`. DerivedData в `~/Library/Developer/Xcode` для этого проекта не используется, чтобы Spotlight/Alfred не открывали старую копию.
 
-Схема подставляет `KEEPSET_PHOTOS_DIR=$(SRCROOT)/photos`. Если открыть `.app` без этой переменной, приложение либо найдёт соседний `photos/`, либо уйдёт в Application Support.
+Схема подставляет `KEEPSET_PHOTOS_DIR=$(SRCROOT)/photos`. Если открыть `.app` без этой переменной (например, `open build/Build/Products/Debug/Keepset.app`), приложение работает с `~/Library/Application Support/Keepset/photos`, а не с репозиторной `photos/`.
 
 Подпись локальная (`CODE_SIGN_IDENTITY: "-"`), hardened runtime включён, в entitlements — доступ к Фототеке.
 

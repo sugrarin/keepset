@@ -3,6 +3,7 @@ import Foundation
 enum PhotoLibraryError: LocalizedError {
     case directoryMissing(URL)
     case seedMissing
+    case notSandbox(URL)
 
     var errorDescription: String? {
         switch self {
@@ -10,6 +11,8 @@ enum PhotoLibraryError: LocalizedError {
             return "Photos folder not found: \(url.path)"
         case .seedMissing:
             return "Bundled demo photos are missing."
+        case .notSandbox(let url):
+            return "Reset is only allowed in a Keepset sandbox folder. \(url.path) has no \(WorkingPhotosDirectory.sandboxMarker) file, so nothing was deleted."
         }
     }
 }
@@ -19,45 +22,45 @@ enum WorkingPhotosDirectory {
         "jpg", "jpeg", "png", "heic", "heif", "webp", "avif", "gif", "tif", "tiff", "bmp"
     ]
 
-    static func resolve() -> URL {
+    /// Reset deletes images for good, so it only runs in folders that carry this file.
+    static let sandboxMarker = ".keepset-sandbox"
+
+    static var defaultApplicationSupport: URL {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("Keepset/photos", isDirectory: true)
+    }
+
+    static func resolve(
+        environment: [String: String] = ProcessInfo.processInfo.environment,
+        seed: URL? = seedURL,
+        applicationSupport: URL = defaultApplicationSupport
+    ) -> URL {
         let fm = FileManager.default
 
-        if let env = ProcessInfo.processInfo.environment["KEEPSET_PHOTOS_DIR"], !env.isEmpty {
+        if let env = environment["KEEPSET_PHOTOS_DIR"], !env.isEmpty {
             let url = URL(fileURLWithPath: env, isDirectory: true)
-            try? fm.createDirectory(at: url, withIntermediateDirectories: true)
+            if !fm.fileExists(atPath: url.path) {
+                try? fm.createDirectory(at: url, withIntermediateDirectories: true)
+                markAsSandbox(url)
+            }
             return url
         }
 
-        let bundleURL = URL(fileURLWithPath: Bundle.main.bundlePath, isDirectory: true).standardizedFileURL
-        let roots: [URL] = [
-            URL(fileURLWithPath: fm.currentDirectoryPath, isDirectory: true),
-            bundleURL
-        ]
-
-        for root in roots {
-            var dir = root.standardizedFileURL
-            for _ in 0..<12 {
-                let candidate = dir.appendingPathComponent("photos", isDirectory: true)
-                if fm.fileExists(atPath: candidate.path), !isInsideAppBundle(candidate, bundleURL: bundleURL) {
-                    return candidate
-                }
-                dir.deleteLastPathComponent()
-            }
+        try? fm.createDirectory(at: applicationSupport, withIntermediateDirectories: true)
+        markAsSandbox(applicationSupport)
+        if isEmpty(applicationSupport), let seed {
+            try? copyImages(from: seed, to: applicationSupport)
         }
-
-        let support = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("Keepset/photos", isDirectory: true)
-        try? fm.createDirectory(at: support, withIntermediateDirectories: true)
-        if isEmpty(support), let seed = seedURL {
-            try? copyImages(from: seed, to: support)
-        }
-        return support
+        return applicationSupport
     }
 
-    private static func isInsideAppBundle(_ url: URL, bundleURL: URL) -> Bool {
-        let path = url.standardizedFileURL.path
-        let bundlePath = bundleURL.path
-        return path == bundlePath || path.hasPrefix(bundlePath + "/")
+    static func isSandbox(_ directory: URL) -> Bool {
+        FileManager.default.fileExists(atPath: directory.appendingPathComponent(sandboxMarker).path)
+    }
+
+    private static func markAsSandbox(_ directory: URL) {
+        guard !isSandbox(directory) else { return }
+        try? Data().write(to: directory.appendingPathComponent(sandboxMarker))
     }
 
     static var seedURL: URL? {
@@ -106,6 +109,7 @@ protocol PhotoFolder: Sendable {
 
 struct FolderPhotoLibrary: PhotoFolder {
     let directory: URL
+    var seed: URL? = WorkingPhotosDirectory.seedURL
 
     var trashDirectory: URL {
         directory.appendingPathComponent(".Trash", isDirectory: true)
@@ -150,7 +154,10 @@ struct FolderPhotoLibrary: PhotoFolder {
     }
 
     func resetFromSeed() throws {
-        guard let seed = WorkingPhotosDirectory.seedURL else {
+        guard WorkingPhotosDirectory.isSandbox(directory) else {
+            throw PhotoLibraryError.notSandbox(directory)
+        }
+        guard let seed else {
             throw PhotoLibraryError.seedMissing
         }
         let fm = FileManager.default
