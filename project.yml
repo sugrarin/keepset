@@ -41,5 +41,20 @@ targets:
       properties:
         com.apple.security.personal-information.photos-library: true
     scheme:
+      testTargets:
+        - KeepsetTests
       environmentVariables:
         KEEPSET_PHOTOS_DIR: $(SRCROOT)/photos
+  KeepsetTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: KeepsetTests
+    dependencies:
+      - target: Keepset
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.keepset.tests
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_IDENTITY: "-"
+        SWIFT_STRICT_CONCURRENCY: complete

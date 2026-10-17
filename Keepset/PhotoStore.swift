@@ -23,27 +23,49 @@ enum PhotoFilter: Equatable {
     case delete
 }
 
+enum TileShape: String {
+    case square
+    case original
+}
+
 @MainActor
 @Observable
 final class PhotoStore {
     var photos: [Photo] = []
     var cameraRollPhotos: [Photo] = []
     var trashedPhotos: [Photo] = []
-    var selectedIDs: Set<Photo.ID> = []
     var mode: WorkspaceMode = .sandbox
     var columnCount: Double = 5
     var filter: PhotoFilter = .all
     var cameraRollAccess: PhotoAccess = .unknown
     var isBusy = false
     var errorMessage: String?
-    var directory: URL
     var isDragSelecting = false
+    var tileShape: TileShape {
+        didSet { defaults.set(tileShape.rawValue, forKey: Self.tileShapeKey) }
+    }
 
-    private var library: FolderPhotoLibrary
+    /// Hearts per workspace, keyed by `selectionKey(for:)`, so switching folders keeps each one's work.
+    private var selections: [String: Set<Photo.ID>]
+    private let folder: any PhotoFolder
+    private let cameraRoll: any CameraRoll
+    private let selectionStorage: any SelectionStorage
+    private let defaults: UserDefaults
+    private var isCameraRollLoaded = false
+    private var isObservingCameraRoll = false
     private var dragAnchorID: Photo.ID?
     private var dragSnapshot: Set<Photo.ID> = []
     private var dragSelects = true
     private var dragDidMove = false
+
+    private static let tileShapeKey = "tileShape"
+
+    var directory: URL { folder.directory }
+
+    var selectedIDs: Set<Photo.ID> {
+        get { selections[selectionKey(for: mode)] ?? [] }
+        set { setSelection(newValue, for: mode) }
+    }
 
     var workingPhotos: [Photo] {
         switch mode {
@@ -82,37 +104,47 @@ final class PhotoStore {
 
     var trashedCount: Int { trashedPhotos.count }
 
-    init() {
-        let directory = WorkingPhotosDirectory.resolve()
-        self.directory = directory
-        self.library = FolderPhotoLibrary(directory: directory)
+    init(
+        folder: any PhotoFolder,
+        cameraRoll: any CameraRoll,
+        selectionStorage: any SelectionStorage,
+        defaults: UserDefaults
+    ) {
+        self.folder = folder
+        self.cameraRoll = cameraRoll
+        self.selectionStorage = selectionStorage
+        self.defaults = defaults
+        self.selections = selectionStorage.load()
+        self.tileShape = defaults.string(forKey: Self.tileShapeKey).flatMap(TileShape.init) ?? .square
+    }
+
+    convenience init() {
+        self.init(
+            folder: FolderPhotoLibrary(directory: WorkingPhotosDirectory.resolve()),
+            cameraRoll: CameraRollLibrary(),
+            selectionStorage: SelectionFile.standard,
+            defaults: .standard
+        )
     }
 
     func load() async {
         isBusy = true
         defer { isBusy = false }
-        do {
-            photos = try library.loadPhotos()
-            trashedPhotos = try library.loadTrashedPhotos()
-            selectedIDs = selectedIDs.intersection(Set(photos.map(\.id)))
-            normalizeFilter()
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        await reloadFolder()
     }
 
     func cancel() {
         selectedIDs = []
         filter = .all
+        saveSelections()
     }
 
     func setWorkspace(_ next: WorkspaceMode) {
         guard mode != next else { return }
-        selectedIDs = []
         filter = .all
         mode = next
         if next == .cameraRoll {
-            Task { await loadCameraRoll() }
+            Task { await loadCameraRollIfNeeded() }
         }
     }
 
@@ -143,6 +175,7 @@ final class PhotoStore {
             selectedIDs.insert(photo.id)
         }
         normalizeFilter()
+        saveSelections()
     }
 
     func handleDragSelect(at photo: Photo) {
@@ -173,6 +206,7 @@ final class PhotoStore {
         dragDidMove = false
         isDragSelecting = false
         normalizeFilter()
+        saveSelections()
     }
 
     private func applyDragRange(to currentID: Photo.ID) {
@@ -194,95 +228,176 @@ final class PhotoStore {
     func selectAll() {
         selectedIDs = Set(workingPhotos.map(\.id))
         normalizeFilter()
+        saveSelections()
     }
 
     func keep() async {
         guard mode == .sandbox || mode == .cameraRoll, !selectedIDs.isEmpty, !isBusy else { return }
-        let toDelete = workingPhotos.filter { !selectedIDs.contains($0.id) }
+        // Captured up front: the user may switch folders while the move is in flight.
+        let workspace = mode
+        let keptIDs = selectedIDs
+        let toDelete = workingPhotos.filter { !keptIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
         do {
             if !toDelete.isEmpty {
-                switch mode {
+                switch workspace {
                 case .sandbox:
-                    try library.moveToTrash(toDelete)
-                    photos.removeAll { !selectedIDs.contains($0.id) }
-                    trashedPhotos = try library.loadTrashedPhotos()
+                    let folder = folder
+                    try await offMain { try folder.moveToTrash(toDelete) }
                 case .cameraRoll:
-                    try await CameraRollLibrary.deletePhotos(toDelete)
-                    cameraRollPhotos.removeAll { !selectedIDs.contains($0.id) }
+                    try await cameraRoll.deletePhotos(toDelete)
+                    cameraRollPhotos.removeAll { !keptIDs.contains($0.id) }
                 case .trash:
                     break
                 }
             }
-            selectedIDs = []
-            filter = .all
+            setSelection([], for: workspace)
+            if mode == workspace {
+                filter = .all
+            }
         } catch is CameraRollError {
             return
         } catch {
             errorMessage = error.localizedDescription
         }
+        if workspace == .sandbox {
+            await reloadFolder()
+        }
+        saveSelections()
+    }
+
+    func loadCameraRollIfNeeded() async {
+        guard !isCameraRollLoaded else { return }
+        await loadCameraRoll()
     }
 
     func loadCameraRoll() async {
         isBusy = true
         defer { isBusy = false }
-        let access = await CameraRollLibrary.requestAccess()
+        let access = await cameraRoll.requestAccess()
         cameraRollAccess = access
-        if access == .authorized {
-            cameraRollPhotos = await Task.detached(priority: .userInitiated) {
-                CameraRollLibrary.fetchPhotos()
-            }.value
-        } else {
+        guard access == .authorized else {
             cameraRollPhotos = []
+            return
         }
-        if mode == .cameraRoll {
-            selectedIDs = selectedIDs.intersection(Set(cameraRollPhotos.map(\.id)))
-            normalizeFilter()
+        if !isObservingCameraRoll {
+            isObservingCameraRoll = true
+            cameraRoll.observeChanges { [weak self] in
+                guard let self else { return }
+                Task { @MainActor in await self.cameraRollDidChange() }
+            }
         }
+        await fetchCameraRoll()
+    }
+
+    func cameraRollDidChange() async {
+        guard isCameraRollLoaded else { return }
+        await fetchCameraRoll()
     }
 
     func restoreSelected() async {
-        guard mode == .trash, !selectedIDs.isEmpty else { return }
+        guard mode == .trash, !selectedIDs.isEmpty, !isBusy else { return }
         let toRestore = trashedPhotos.filter { selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
         do {
-            try library.restorePhotos(toRestore)
-            photos = try library.loadPhotos()
-            trashedPhotos = try library.loadTrashedPhotos()
-            selectedIDs = []
+            let folder = folder
+            try await offMain { try folder.restorePhotos(toRestore) }
+            setSelection([], for: .trash)
         } catch {
             errorMessage = error.localizedDescription
         }
+        await reloadFolder()
+        saveSelections()
     }
 
     func emptyTrash() async {
-        guard mode == .trash else { return }
+        guard mode == .trash, !isBusy else { return }
         isBusy = true
         defer { isBusy = false }
         do {
-            try library.emptyTrash()
-            trashedPhotos = []
-            selectedIDs = []
+            let folder = folder
+            try await offMain { try folder.emptyTrash() }
+            setSelection([], for: .trash)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        await reloadFolder()
+        saveSelections()
+    }
+
+    func resetSandbox() async {
+        guard !isBusy else { return }
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let folder = folder
+            try await offMain { try folder.resetFromSeed() }
+            setSelection([], for: .sandbox)
+            setSelection([], for: .trash)
+            filter = .all
+            mode = .sandbox
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        await reloadFolder()
+        saveSelections()
+    }
+
+    private func reloadFolder() async {
+        let folder = folder
+        do {
+            let (live, trashed) = try await offMain {
+                (try folder.loadPhotos(), try folder.loadTrashedPhotos())
+            }
+            photos = live
+            trashedPhotos = trashed
+            pruneSelection(for: .sandbox, to: live)
+            pruneSelection(for: .trash, to: trashed)
+            normalizeFilter()
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
-    func resetSandbox() async {
-        isBusy = true
-        defer { isBusy = false }
-        do {
-            try library.resetFromSeed()
-            selectedIDs = []
-            filter = .all
-            mode = .sandbox
-            photos = try library.loadPhotos()
-            trashedPhotos = try library.loadTrashedPhotos()
-        } catch {
-            errorMessage = error.localizedDescription
+    private func fetchCameraRoll() async {
+        let cameraRoll = cameraRoll
+        cameraRollPhotos = await Task.detached(priority: .userInitiated) {
+            cameraRoll.fetchPhotos()
+        }.value
+        isCameraRollLoaded = true
+        pruneSelection(for: .cameraRoll, to: cameraRollPhotos)
+        normalizeFilter()
+    }
+
+    private func offMain<T: Sendable>(_ work: @escaping @Sendable () throws -> T) async throws -> T {
+        try await Task.detached(priority: .userInitiated, operation: work).value
+    }
+
+    private func selectionKey(for workspace: WorkspaceMode) -> String {
+        switch workspace {
+        case .sandbox: "sandbox:\(folder.directory.path)"
+        case .trash: "trash:\(folder.directory.path)"
+        case .cameraRoll: "cameraRoll"
         }
+    }
+
+    private func setSelection(_ ids: Set<Photo.ID>, for workspace: WorkspaceMode) {
+        selections[selectionKey(for: workspace)] = ids.isEmpty ? nil : ids
+    }
+
+    private func pruneSelection(for workspace: WorkspaceMode, to existing: [Photo]) {
+        let key = selectionKey(for: workspace)
+        guard let selected = selections[key] else { return }
+        let kept = selected.intersection(existing.map(\.id))
+        guard kept != selected else { return }
+        setSelection(kept, for: workspace)
+        saveSelections()
+    }
+
+    private func saveSelections() {
+        selectionStorage.save(selections)
     }
 
     private func normalizeFilter() {

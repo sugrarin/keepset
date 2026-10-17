@@ -5,6 +5,7 @@ struct PhotoCell: View {
     let isSelected: Bool
     let isDragSelecting: Bool
     let columnCount: Int
+    let tileShape: TileShape
     let onToggle: () -> Void
     let onPreview: (Bool) -> Void
     let onDragChanged: (CGPoint) -> Void
@@ -21,9 +22,41 @@ struct PhotoCell: View {
         }
     }
 
+    private var tileAspectRatio: CGFloat {
+        guard tileShape == .original, let image, image.height > 0 else { return 1 }
+        return CGFloat(image.width) / CGFloat(image.height)
+    }
+
     var body: some View {
-        Theme.canvas
+        // The slot stays square in both shapes so drag hit-testing can map points to cells arithmetically.
+        Color.clear
             .aspectRatio(1, contentMode: .fit)
+            .overlay {
+                tile
+                    .aspectRatio(tileAspectRatio, contentMode: .fit)
+            }
+            .contentShape(Rectangle())
+            .onHover { hovering = $0 }
+            .onTapGesture(perform: onToggle)
+            .gesture(
+                DragGesture(minimumDistance: 4, coordinateSpace: .named("photoGrid"))
+                    .onChanged { value in
+                        onDragChanged(value.startLocation)
+                        onDragChanged(value.location)
+                    }
+                    .onEnded { _ in
+                        onDragEnded()
+                    }
+            )
+            .animation(.easeOut(duration: 0.12), value: hovering)
+            .animation(.easeOut(duration: 0.12), value: isSelected)
+            .task(id: "\(photo.id)-\(maxPixel)") {
+                image = await ThumbnailLoader.shared.image(for: photo, maxPixel: maxPixel)
+            }
+    }
+
+    private var tile: some View {
+        Theme.canvas
             .overlay {
                 if let image {
                     Image(decorative: image, scale: 1)
@@ -55,25 +88,7 @@ struct PhotoCell: View {
                     .offset(y: hovering && !isDragSelecting ? 0 : 4)
                     .allowsHitTesting(!isDragSelecting)
             }
-            .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             .scaleEffect(isSelected ? 0.97 : 1)
-            .onHover { hovering = $0 }
-            .onTapGesture(perform: onToggle)
-            .gesture(
-                DragGesture(minimumDistance: 4, coordinateSpace: .named("photoGrid"))
-                    .onChanged { value in
-                        onDragChanged(value.startLocation)
-                        onDragChanged(value.location)
-                    }
-                    .onEnded { _ in
-                        onDragEnded()
-                    }
-            )
-            .animation(.easeOut(duration: 0.12), value: hovering)
-            .animation(.easeOut(duration: 0.12), value: isSelected)
-            .task(id: "\(photo.id)-\(maxPixel)") {
-                image = await ThumbnailLoader.shared.image(for: photo, maxPixel: maxPixel)
-            }
     }
 }
 

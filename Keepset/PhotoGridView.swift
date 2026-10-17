@@ -3,6 +3,7 @@ import SwiftUI
 struct PhotoGridView: View {
     let photos: [Photo]
     let columns: Int
+    let tileShape: TileShape
     let selectedIDs: Set<Photo.ID>
     let isDragSelecting: Bool
     let onToggle: (Photo) -> Void
@@ -10,21 +11,29 @@ struct PhotoGridView: View {
     let onDragSelect: (Photo) -> Void
     let onDragSelectEnd: () -> Void
 
-    @State private var cellFrames: [Photo.ID: CGRect] = [:]
+    @State private var gridWidth: CGFloat = 0
+
+    private static let spacing: CGFloat = 3
+    private static let inset: CGFloat = 3
 
     private var items: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 3), count: max(columns, 1))
+        Array(repeating: GridItem(.flexible(), spacing: Self.spacing), count: max(columns, 1))
+    }
+
+    private var geometry: GridGeometry {
+        GridGeometry(width: gridWidth, columns: max(columns, 1), spacing: Self.spacing, inset: Self.inset)
     }
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: items, spacing: 3) {
+            LazyVGrid(columns: items, spacing: Self.spacing) {
                 ForEach(photos) { photo in
                     PhotoCell(
                         photo: photo,
                         isSelected: selectedIDs.contains(photo.id),
                         isDragSelecting: isDragSelecting,
                         columnCount: columns,
+                        tileShape: tileShape,
                         onToggle: { onToggle(photo) },
                         onPreview: { hovering in
                             onPreview(hovering ? photo : nil)
@@ -32,36 +41,18 @@ struct PhotoGridView: View {
                         onDragChanged: handleDragChanged,
                         onDragEnded: onDragSelectEnd
                     )
-                    .background {
-                        GeometryReader { geo in
-                            Color.clear.preference(
-                                key: CellFramesKey.self,
-                                value: [photo.id: geo.frame(in: .named("photoGrid"))]
-                            )
-                        }
-                    }
                 }
             }
-            .padding(3)
-            .padding(.bottom, 24)
+            .padding(Self.inset)
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { gridWidth = $0 }
             .coordinateSpace(name: "photoGrid")
-            .onPreferenceChange(CellFramesKey.self) { cellFrames = $0 }
+            .padding(.bottom, 24)
         }
         .scrollContentBackground(.hidden)
     }
 
     private func handleDragChanged(_ location: CGPoint) {
-        guard let id = cellFrames.first(where: { $0.value.contains(location) })?.key,
-              let photo = photos.first(where: { $0.id == id })
-        else { return }
-        onDragSelect(photo)
-    }
-}
-
-private struct CellFramesKey: PreferenceKey {
-    static let defaultValue: [Photo.ID: CGRect] = [:]
-
-    static func reduce(value: inout [Photo.ID: CGRect], nextValue: () -> [Photo.ID: CGRect]) {
-        value.merge(nextValue(), uniquingKeysWith: { $1 })
+        guard let index = geometry.index(at: location, count: photos.count) else { return }
+        onDragSelect(photos[index])
     }
 }

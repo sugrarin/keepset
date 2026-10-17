@@ -15,6 +15,7 @@ struct ContentView: View {
                 PhotoGridView(
                     photos: store.displayedPhotos,
                     columns: store.columns,
+                    tileShape: store.tileShape,
                     selectedIDs: store.selectedIDs,
                     isDragSelecting: store.isDragSelecting,
                     onToggle: store.toggle,

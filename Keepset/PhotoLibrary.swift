@@ -94,7 +94,17 @@ enum WorkingPhotosDirectory {
     }
 }
 
-struct FolderPhotoLibrary: Sendable {
+protocol PhotoFolder: Sendable {
+    var directory: URL { get }
+    func loadPhotos() throws -> [Photo]
+    func loadTrashedPhotos() throws -> [Photo]
+    func moveToTrash(_ photos: [Photo]) throws
+    func restorePhotos(_ photos: [Photo]) throws
+    func emptyTrash() throws
+    func resetFromSeed() throws
+}
+
+struct FolderPhotoLibrary: PhotoFolder {
     let directory: URL
 
     var trashDirectory: URL {

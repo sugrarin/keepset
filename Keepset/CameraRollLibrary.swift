@@ -1,4 +1,5 @@
 import Foundation
+import os
 import Photos
 
 enum PhotoAccess: Equatable {
@@ -11,8 +12,17 @@ enum CameraRollError: Error {
     case cancelled
 }
 
-enum CameraRollLibrary {
-    static func requestAccess() async -> PhotoAccess {
+protocol CameraRoll: Sendable {
+    func requestAccess() async -> PhotoAccess
+    func fetchPhotos() -> [Photo]
+    func deletePhotos(_ photos: [Photo]) async throws
+    func observeChanges(_ onChange: @escaping @Sendable () -> Void)
+}
+
+final class CameraRollLibrary: NSObject, CameraRoll, PHPhotoLibraryChangeObserver {
+    private let onChange = OSAllocatedUnfairLock<(@Sendable () -> Void)?>(initialState: nil)
+
+    func requestAccess() async -> PhotoAccess {
         let status: PHAuthorizationStatus
         let current = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         if current == .notDetermined {
@@ -28,7 +38,7 @@ enum CameraRollLibrary {
         }
     }
 
-    static func fetchPhotos() -> [Photo] {
+    func fetchPhotos() -> [Photo] {
         let options = PHFetchOptions()
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         options.includeHiddenAssets = false
@@ -36,12 +46,12 @@ enum CameraRollLibrary {
         var photos: [Photo] = []
         photos.reserveCapacity(result.count)
         result.enumerateObjects { asset, _, _ in
-            let filename = PHAssetResource.assetResources(for: asset).first?.originalFilename ?? "Photo"
+            // The original filename costs a resource lookup per asset, so it is resolved lazily for the preview.
             photos.append(
                 Photo(
                     id: asset.localIdentifier,
                     source: .asset(asset.localIdentifier),
-                    filename: filename,
+                    filename: "",
                     modifiedAt: asset.modificationDate ?? asset.creationDate ?? .distantPast
                 )
             )
@@ -49,7 +59,14 @@ enum CameraRollLibrary {
         return photos
     }
 
-    static func deletePhotos(_ photos: [Photo]) async throws {
+    static func originalFilename(for identifier: String) -> String? {
+        guard let asset = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil).firstObject else {
+            return nil
+        }
+        return PHAssetResource.assetResources(for: asset).first?.originalFilename
+    }
+
+    func deletePhotos(_ photos: [Photo]) async throws {
         let ids = photos.compactMap { photo -> String? in
             if case .asset(let id) = photo.source { return id }
             return nil
@@ -69,5 +86,14 @@ enum CameraRollLibrary {
         } catch let error as PHPhotosError where error.code == .userCancelled {
             throw CameraRollError.cancelled
         }
+    }
+
+    func observeChanges(_ onChange: @escaping @Sendable () -> Void) {
+        self.onChange.withLock { $0 = onChange }
+        PHPhotoLibrary.shared().register(self)
+    }
+
+    func photoLibraryDidChange(_ changeInstance: PHChange) {
+        onChange.withLock { $0 }?()
     }
 }

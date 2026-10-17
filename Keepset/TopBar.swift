@@ -17,6 +17,7 @@ struct TopBar: View {
         HStack(spacing: 12) {
             HStack(spacing: 12) {
                 gridSizeSlider
+                TileShapeToggle()
                 if store.mode == .sandbox || store.mode == .cameraRoll {
                     FilterTabs()
                 }
@@ -165,6 +166,39 @@ private struct FolderPicker: View {
             get: { store.mode },
             set: { store.setWorkspace($0) }
         )
+    }
+}
+
+private struct TileShapeToggle: View {
+    @Environment(PhotoStore.self) private var store
+
+    var body: some View {
+        HStack(spacing: 2) {
+            option(.square, symbol: "square", help: "Square tiles")
+            option(.original, symbol: "rectangle.portrait", help: "Original shape")
+        }
+        .padding(3)
+        .frame(height: BarControl.height)
+        .background(Theme.surface, in: BarControl.shape)
+    }
+
+    private func option(_ shape: TileShape, symbol: String, help: String) -> some View {
+        let selected = store.tileShape == shape
+        return Button {
+            store.tileShape = shape
+        } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 12, weight: .semibold))
+                .frame(width: 32)
+                .frame(maxHeight: .infinity)
+                .foregroundStyle(.white.opacity(selected ? 0.95 : 0.6))
+                .background(selected ? Theme.canvas : Color.clear, in: Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(FillHitButtonStyle())
+        .help(help)
+        .accessibilityLabel(help)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 

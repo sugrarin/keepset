@@ -8,36 +8,63 @@
 
 /* Begin PBXBuildFile section */
 		0236870031A0A59CBBEB3A82 /* photos in Resources */ = {isa = PBXBuildFile; fileRef = FD42635FA44A4C8F6F5539DC /* photos */; };
+		2D0B757D2B1B5FD4665D0599 /* GridGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E9F8DA6C1FAA5551849910 /* GridGeometryTests.swift */; };
 		2D91614BE3AE5DA876F19E59 /* PreviewOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA98FA0FAD81AE8D502CBA78 /* PreviewOverlay.swift */; };
 		386418C80303A6C00D9FCBCB /* CameraRollLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */; };
 		3BF344A7273A81BAC9121BDC /* ThumbnailLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD1976260F852991A8990722 /* ThumbnailLoader.swift */; };
 		569847E5C8035CF17EA899D6 /* PhotoGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E0509B54DB3DDC3CA10BAF3 /* PhotoGridView.swift */; };
+		5AFB837C53D524D56BA3BC99 /* GridGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E78D8233FFDADF7FCE43652 /* GridGeometry.swift */; };
+		644ED416E07127B99619849F /* TileShapeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10DFB268186399447F770BBB /* TileShapeTests.swift */; };
 		663585E00CFF9F517E6C1C25 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79AADB383ACB0AE70307429 /* Theme.swift */; };
 		689A6EF7A5D158E38C7495D6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0FC711248D9B602FFF749052 /* Assets.xcassets */; };
 		6B9D4D83C71B8F2F0052A156 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1C83866CFBB3CEFD94D3FF1 /* ContentView.swift */; };
 		73237A89CF20E7FE14D76C22 /* TopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAD752B465ECBF3C16630856 /* TopBar.swift */; };
+		75F0C8067C857237E790AB1B /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8877BD44435EA7D74460BCE /* TestSupport.swift */; };
 		8247EC26EA6050029F48F0BF /* KeepsetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */; };
 		89BE6D0D071AD207720EED03 /* PhotoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCCF4AA3154B23FD98713A4 /* PhotoStore.swift */; };
+		B6AD510630C9AFD2E12BE03F /* SelectionFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82D2F6A30A24F4F1F0868F2 /* SelectionFile.swift */; };
+		B9C82F246DFB8539509A72F1 /* SelectionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E023E399B4B53668CCDC2954 /* SelectionPersistenceTests.swift */; };
 		BDD6E3A4EBE9C0828FC44A6C /* PhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */; };
 		BEDF81CDFCED4D546D2A8DBC /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B390205C039C743924283F7 /* PhotoCell.swift */; };
+		D1A135A16B1B9A9FB0F02224 /* CameraRollLoadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27BE721FA6CDD49D13A9D35 /* CameraRollLoadingTests.swift */; };
 		D551DE08151B7DD0BAACF3F7 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D67A324726828DC9AA9001F /* Photo.swift */; };
+		FCFEA5014F160CE30613BAE0 /* ThumbnailLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A5F50CBF56E0534FA68CECE /* ThumbnailLoaderTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D1E1E2EEF0616996B8BC8CB0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E251AC5AAEE235535AB59BED /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A6A8A1AB672AD74D2B8FF524;
+			remoteInfo = Keepset;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0FC711248D9B602FFF749052 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		10DFB268186399447F770BBB /* TileShapeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TileShapeTests.swift; sourceTree = "<group>"; };
 		4B390205C039C743924283F7 /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRollLibrary.swift; sourceTree = "<group>"; };
 		5E0509B54DB3DDC3CA10BAF3 /* PhotoGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGridView.swift; sourceTree = "<group>"; };
 		638550F872EADB57AA06CDAE /* Keepset.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keepset.entitlements; sourceTree = "<group>"; };
 		65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibrary.swift; sourceTree = "<group>"; };
+		86E9F8DA6C1FAA5551849910 /* GridGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridGeometryTests.swift; sourceTree = "<group>"; };
+		8A5F50CBF56E0534FA68CECE /* ThumbnailLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailLoaderTests.swift; sourceTree = "<group>"; };
+		8E78D8233FFDADF7FCE43652 /* GridGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridGeometry.swift; sourceTree = "<group>"; };
 		99534D1BD02317E2726781B0 /* Keepset.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Keepset.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D67A324726828DC9AA9001F /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		A79AADB383ACB0AE70307429 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		AAD752B465ECBF3C16630856 /* TopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBar.swift; sourceTree = "<group>"; };
+		C27BE721FA6CDD49D13A9D35 /* CameraRollLoadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRollLoadingTests.swift; sourceTree = "<group>"; };
 		D1C83866CFBB3CEFD94D3FF1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DA98FA0FAD81AE8D502CBA78 /* PreviewOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewOverlay.swift; sourceTree = "<group>"; };
 		DCCCF4AA3154B23FD98713A4 /* PhotoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoStore.swift; sourceTree = "<group>"; };
+		E023E399B4B53668CCDC2954 /* SelectionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionPersistenceTests.swift; sourceTree = "<group>"; };
 		E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepsetApp.swift; sourceTree = "<group>"; };
+		E77EEBE2DCA89E69A64EDB13 /* KeepsetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeepsetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8877BD44435EA7D74460BCE /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		F82D2F6A30A24F4F1F0868F2 /* SelectionFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionFile.swift; sourceTree = "<group>"; };
 		FD1976260F852991A8990722 /* ThumbnailLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailLoader.swift; sourceTree = "<group>"; };
 		FD42635FA44A4C8F6F5539DC /* photos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = photos; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -49,6 +76,7 @@
 				0FC711248D9B602FFF749052 /* Assets.xcassets */,
 				5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */,
 				D1C83866CFBB3CEFD94D3FF1 /* ContentView.swift */,
+				8E78D8233FFDADF7FCE43652 /* GridGeometry.swift */,
 				638550F872EADB57AA06CDAE /* Keepset.entitlements */,
 				E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */,
 				9D67A324726828DC9AA9001F /* Photo.swift */,
@@ -57,6 +85,7 @@
 				65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */,
 				DCCCF4AA3154B23FD98713A4 /* PhotoStore.swift */,
 				DA98FA0FAD81AE8D502CBA78 /* PreviewOverlay.swift */,
+				F82D2F6A30A24F4F1F0868F2 /* SelectionFile.swift */,
 				A79AADB383ACB0AE70307429 /* Theme.swift */,
 				FD1976260F852991A8990722 /* ThumbnailLoader.swift */,
 				AAD752B465ECBF3C16630856 /* TopBar.swift */,
@@ -64,10 +93,24 @@
 			path = Keepset;
 			sourceTree = "<group>";
 		};
+		2D82B78953187FBECE6A67B0 /* KeepsetTests */ = {
+			isa = PBXGroup;
+			children = (
+				C27BE721FA6CDD49D13A9D35 /* CameraRollLoadingTests.swift */,
+				86E9F8DA6C1FAA5551849910 /* GridGeometryTests.swift */,
+				E023E399B4B53668CCDC2954 /* SelectionPersistenceTests.swift */,
+				E8877BD44435EA7D74460BCE /* TestSupport.swift */,
+				8A5F50CBF56E0534FA68CECE /* ThumbnailLoaderTests.swift */,
+				10DFB268186399447F770BBB /* TileShapeTests.swift */,
+			);
+			path = KeepsetTests;
+			sourceTree = "<group>";
+		};
 		392C48F744BBC77923F0524E /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				99534D1BD02317E2726781B0 /* Keepset.app */,
+				E77EEBE2DCA89E69A64EDB13 /* KeepsetTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -77,6 +120,7 @@
 			children = (
 				FD42635FA44A4C8F6F5539DC /* photos */,
 				214C3B30265EAF7EEAA2C600 /* Keepset */,
+				2D82B78953187FBECE6A67B0 /* KeepsetTests */,
 				392C48F744BBC77923F0524E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -84,6 +128,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		260016065A113317E04681DE /* KeepsetTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 505ACF814B540726E7374BD8 /* Build configuration list for PBXNativeTarget "KeepsetTests" */;
+			buildPhases = (
+				4E33FCCB5ED7D260A9BC3801 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				8691D3BCAF5A360640DD26BF /* PBXTargetDependency */,
+			);
+			name = KeepsetTests;
+			packageProductDependencies = (
+			);
+			productName = KeepsetTests;
+			productReference = E77EEBE2DCA89E69A64EDB13 /* KeepsetTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A6A8A1AB672AD74D2B8FF524 /* Keepset */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1E4F06C4259482759589F367 /* Build configuration list for PBXNativeTarget "Keepset" */;
@@ -128,6 +190,7 @@
 			projectRoot = "";
 			targets = (
 				A6A8A1AB672AD74D2B8FF524 /* Keepset */,
+				260016065A113317E04681DE /* KeepsetTests */,
 			);
 		};
 /* End PBXProject section */
@@ -151,6 +214,7 @@
 			files = (
 				386418C80303A6C00D9FCBCB /* CameraRollLibrary.swift in Sources */,
 				6B9D4D83C71B8F2F0052A156 /* ContentView.swift in Sources */,
+				5AFB837C53D524D56BA3BC99 /* GridGeometry.swift in Sources */,
 				8247EC26EA6050029F48F0BF /* KeepsetApp.swift in Sources */,
 				D551DE08151B7DD0BAACF3F7 /* Photo.swift in Sources */,
 				BEDF81CDFCED4D546D2A8DBC /* PhotoCell.swift in Sources */,
@@ -158,13 +222,35 @@
 				BDD6E3A4EBE9C0828FC44A6C /* PhotoLibrary.swift in Sources */,
 				89BE6D0D071AD207720EED03 /* PhotoStore.swift in Sources */,
 				2D91614BE3AE5DA876F19E59 /* PreviewOverlay.swift in Sources */,
+				B6AD510630C9AFD2E12BE03F /* SelectionFile.swift in Sources */,
 				663585E00CFF9F517E6C1C25 /* Theme.swift in Sources */,
 				3BF344A7273A81BAC9121BDC /* ThumbnailLoader.swift in Sources */,
 				73237A89CF20E7FE14D76C22 /* TopBar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4E33FCCB5ED7D260A9BC3801 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1A135A16B1B9A9FB0F02224 /* CameraRollLoadingTests.swift in Sources */,
+				2D0B757D2B1B5FD4665D0599 /* GridGeometryTests.swift in Sources */,
+				B9C82F246DFB8539509A72F1 /* SelectionPersistenceTests.swift in Sources */,
+				75F0C8067C857237E790AB1B /* TestSupport.swift in Sources */,
+				FCFEA5014F160CE30613BAE0 /* ThumbnailLoaderTests.swift in Sources */,
+				644ED416E07127B99619849F /* TileShapeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8691D3BCAF5A360640DD26BF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A6A8A1AB672AD74D2B8FF524 /* Keepset */;
+			targetProxy = D1E1E2EEF0616996B8BC8CB0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		49527F8BF472428F18DE154F /* Debug */ = {
@@ -257,6 +343,44 @@
 			};
 			name = Debug;
 		};
+		C2AD9F50AF3CF23F0E8613DA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.keepset.tests;
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keepset.app/Contents/MacOS/Keepset";
+			};
+			name = Debug;
+		};
+		CD521053C186A79688CBEE97 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.keepset.tests;
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Keepset.app/Contents/MacOS/Keepset";
+			};
+			name = Release;
+		};
 		DB6DAD5CFDE49D3BFB57A286 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -348,6 +472,15 @@
 			buildConfigurations = (
 				49527F8BF472428F18DE154F /* Debug */,
 				E4F6E25220568BC053721FBC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		505ACF814B540726E7374BD8 /* Build configuration list for PBXNativeTarget "KeepsetTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C2AD9F50AF3CF23F0E8613DA /* Debug */,
+				CD521053C186A79688CBEE97 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
