@@ -32,6 +32,7 @@ enum WorkingPhotosDirectory {
 
     static func resolve(
         environment: [String: String] = ProcessInfo.processInfo.environment,
+        savedFolder: String? = nil,
         seed: URL? = seedURL,
         applicationSupport: URL = defaultApplicationSupport
     ) -> URL {
@@ -46,12 +47,22 @@ enum WorkingPhotosDirectory {
             return url
         }
 
+        // A folder the user picked is theirs: never seeded and never marked, so Reset can't touch it.
+        if let savedFolder, isDirectory(URL(fileURLWithPath: savedFolder)) {
+            return URL(fileURLWithPath: savedFolder, isDirectory: true)
+        }
+
         try? fm.createDirectory(at: applicationSupport, withIntermediateDirectories: true)
         markAsSandbox(applicationSupport)
         if isEmpty(applicationSupport), let seed {
             try? copyImages(from: seed, to: applicationSupport)
         }
         return applicationSupport
+    }
+
+    private static func isDirectory(_ url: URL) -> Bool {
+        var isDirectory: ObjCBool = false
+        return FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) && isDirectory.boolValue
     }
 
     static func isSandbox(_ directory: URL) -> Bool {

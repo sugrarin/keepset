@@ -20,8 +20,13 @@ final class WorkingDirectoryTests {
         try? FileManager.default.removeItem(at: root)
     }
 
-    private func resolve(environment: [String: String] = [:]) -> URL {
-        WorkingPhotosDirectory.resolve(environment: environment, seed: seed, applicationSupport: support)
+    private func resolve(environment: [String: String] = [:], savedFolder: String? = nil) -> URL {
+        WorkingPhotosDirectory.resolve(
+            environment: environment,
+            savedFolder: savedFolder,
+            seed: seed,
+            applicationSupport: support
+        )
     }
 
     private func names(in folder: URL) throws -> Set<String> {
@@ -65,6 +70,37 @@ final class WorkingDirectoryTests {
         _ = resolve(environment: ["KEEPSET_PHOTOS_DIR": existing.path])
 
         #expect(!isMarked(existing))
+    }
+
+    @Test func savedFolderReplacesApplicationSupport() throws {
+        let chosen = root.appendingPathComponent("chosen", isDirectory: true)
+        try FileManager.default.createDirectory(at: chosen, withIntermediateDirectories: true)
+
+        #expect(resolve(savedFolder: chosen.path) == chosen)
+    }
+
+    @Test func savedFolderIsNeverMarkedOrSeeded() throws {
+        let chosen = root.appendingPathComponent("chosen", isDirectory: true)
+        try FileManager.default.createDirectory(at: chosen, withIntermediateDirectories: true)
+
+        _ = resolve(savedFolder: chosen.path)
+
+        #expect(!isMarked(chosen))
+        #expect(try names(in: chosen).isEmpty)
+    }
+
+    @Test func missingSavedFolderFallsBackToApplicationSupport() {
+        let gone = root.appendingPathComponent("gone", isDirectory: true)
+
+        #expect(resolve(savedFolder: gone.path) == support)
+    }
+
+    @Test func environmentOverrideBeatsSavedFolder() throws {
+        let chosen = root.appendingPathComponent("chosen", isDirectory: true)
+        let custom = root.appendingPathComponent("custom", isDirectory: true)
+        try FileManager.default.createDirectory(at: chosen, withIntermediateDirectories: true)
+
+        #expect(resolve(environment: ["KEEPSET_PHOTOS_DIR": custom.path], savedFolder: chosen.path) == custom)
     }
 
     @Test func resetRefusesUnmarkedFolder() throws {

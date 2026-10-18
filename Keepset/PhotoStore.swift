@@ -55,7 +55,8 @@ final class PhotoStore {
 
     /// Hearts per workspace, keyed by `selectionKey(for:)`, so switching folders keeps each one's work.
     private var selections: [String: Set<Photo.ID>]
-    private let folder: any PhotoFolder
+    private var folder: any PhotoFolder
+    private let resolveDefaultDirectory: () -> URL
     private let cameraRoll: any CameraRoll
     private let selectionStorage: any SelectionStorage
     private let defaults: UserDefaults
@@ -67,8 +68,13 @@ final class PhotoStore {
     private var dragDidMove = false
 
     private static let tileShapeKey = "tileShape"
+    static let photosFolderKey = "photosFolder"
 
     var directory: URL { folder.directory }
+
+    var isSandboxFolder: Bool {
+        WorkingPhotosDirectory.isSandbox(directory)
+    }
 
     var selectedIDs: Set<Photo.ID> {
         get { selections[selectionKey(for: mode)] ?? [] }
@@ -116,9 +122,11 @@ final class PhotoStore {
         folder: any PhotoFolder,
         cameraRoll: any CameraRoll,
         selectionStorage: any SelectionStorage,
-        defaults: UserDefaults
+        defaults: UserDefaults,
+        resolveDefaultDirectory: @escaping () -> URL = { WorkingPhotosDirectory.resolve(environment: [:]) }
     ) {
         self.folder = folder
+        self.resolveDefaultDirectory = resolveDefaultDirectory
         self.cameraRoll = cameraRoll
         self.selectionStorage = selectionStorage
         self.defaults = defaults
@@ -128,7 +136,9 @@ final class PhotoStore {
 
     convenience init() {
         self.init(
-            folder: FolderPhotoLibrary(directory: WorkingPhotosDirectory.resolve()),
+            folder: FolderPhotoLibrary(directory: WorkingPhotosDirectory.resolve(
+                savedFolder: UserDefaults.standard.string(forKey: Self.photosFolderKey)
+            )),
             cameraRoll: CameraRollLibrary(),
             selectionStorage: SelectionFile.standard,
             defaults: .standard
@@ -139,6 +149,28 @@ final class PhotoStore {
         isBusy = true
         defer { isBusy = false }
         await reloadFolder()
+    }
+
+    func chooseFolder(_ url: URL) async {
+        guard !isBusy else { return }
+        defaults.set(url.path, forKey: Self.photosFolderKey)
+        await switchFolder(to: url)
+    }
+
+    func useDefaultFolder() async {
+        guard !isBusy else { return }
+        defaults.removeObject(forKey: Self.photosFolderKey)
+        await switchFolder(to: resolveDefaultDirectory())
+    }
+
+    private func switchFolder(to url: URL) async {
+        folder = FolderPhotoLibrary(directory: url)
+        lastDeletion = nil
+        filter = .all
+        mode = .sandbox
+        photos = []
+        trashedPhotos = []
+        await load()
     }
 
     func cancel() {

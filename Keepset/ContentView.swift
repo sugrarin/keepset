@@ -37,9 +37,10 @@ struct ContentView: View {
                         EmptyTrashView()
                     case .sandbox where store.photos.isEmpty:
                         EmptySandboxView(
-                            canReset: WorkingPhotosDirectory.seedURL != nil,
+                            canReset: WorkingPhotosDirectory.seedURL != nil && store.isSandboxFolder,
                             onReset: { Task { await store.resetSandbox() } },
-                            onShowFolder: { NSWorkspace.shared.open(store.directory) }
+                            onShowFolder: { NSWorkspace.shared.open(store.directory) },
+                            onChooseFolder: { Task { await store.chooseFolderWithPanel() } }
                         )
                     case .cameraRoll:
                         EmptyCameraRollView(access: store.cameraRollAccess) {
@@ -194,21 +195,23 @@ private struct EmptySandboxView: View {
     let canReset: Bool
     let onReset: () -> Void
     let onShowFolder: () -> Void
+    let onChooseFolder: () -> Void
 
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "photo.on.rectangle.angled")
                 .font(.system(size: 42, weight: .light))
                 .foregroundStyle(.white.opacity(0.55))
-            Text("No photos in the sandbox")
+            Text("No photos in this folder")
                 .font(.title3.weight(.medium))
-            Text(canReset ? "Reset to restore the demo folder." : "Add photos to the sandbox folder and come back.")
+            Text(canReset ? "Reset to restore the demo folder." : "Choose a folder or add photos to this one and come back.")
                 .foregroundStyle(.secondary)
             Button(canReset ? "Reset Demo Photos" : "Show Folder", action: canReset ? onReset : onShowFolder)
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.accent)
                 .foregroundStyle(Theme.onAccent)
                 .padding(.top, 6)
+            Button("Choose Folder…", action: onChooseFolder)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

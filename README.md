@@ -31,13 +31,15 @@ xattr -dr com.apple.quarantine /Applications/Keepset.app
 
 ## Usage
 
-Keepset works with two sources: the Camera Roll and a Sandbox folder. The Sandbox is `~/Library/Application Support/Keepset/photos`: copy photos there (Sandbox → Show Photos Folder opens it) and come back to the app. To work on another folder, set `KEEPSET_PHOTOS_DIR` to its path before launching:
+Keepset works with two sources: the Camera Roll and a photo folder. Pick the folder with **Choose Folder…** (⌘O, also in the folder menu in the top bar and on the empty screen). Keepset remembers it between launches; **Sandbox → Use Default Folder** goes back to `~/Library/Application Support/Keepset/photos`, which is where a fresh install starts (Sandbox → Show Photos Folder opens the current folder).
+
+To launch on a specific folder from the command line, set `KEEPSET_PHOTOS_DIR`. It takes priority over the remembered choice:
 
 ```bash
 open -n --env KEEPSET_PHOTOS_DIR=$HOME/Pictures/shoot /Applications/Keepset.app
 ```
 
-Deleting in a Sandbox folder moves files to a `.Trash` folder inside it, never to the system Trash.
+Deleting in a folder moves files to a `.Trash` folder inside it, never to the system Trash.
 
 | Action | Shortcut |
 |---|---|
@@ -46,6 +48,7 @@ Deleting in a Sandbox folder moves files to a `.Trash` folder inside it, never t
 | Undo the last delete | ⌘Z |
 | Clear selection | Esc |
 | Open Trash | ⇧⌘T |
+| Choose a folder | ⌘O |
 
 ## Build from source
 

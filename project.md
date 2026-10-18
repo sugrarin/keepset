@@ -50,6 +50,8 @@ macOS-приложение для разбора папки с фото: отм�
 | Снять выбор | `Esc` |
 | Сбросить демо-папку | `⌘⇧R` |
 | Открыть корзину | `⌘⇧T` |
+| Выбрать папку с фото | `⌘O` или меню Sandbox → Choose Folder…, пункт Choose Folder… в меню папки, кнопка на пустом экране |
+| Вернуться к папке по умолчанию | меню Sandbox → Use Default Folder |
 | Показать папку с фото | меню Sandbox → Show Photos Folder |
 
 ---
@@ -72,13 +74,16 @@ photos/.Trash/          ← recently deleted, не системная Корзи
 `WorkingPhotosDirectory.resolve()` выбирает папку так:
 
 1. Переменная окружения `KEEPSET_PHOTOS_DIR`. В Xcode-схеме она равна `$(SRCROOT)/photos`, поэтому из Xcode приложение всегда работает с репозиторной папкой. Если такой папки нет, приложение создаёт её и помечает маркером.
-2. Иначе `~/Library/Application Support/Keepset/photos`. Если она пустая, туда копируется seed из ресурсов бандла.
+2. Папка, выбранная в приложении (`NSOpenPanel`, путь лежит в `UserDefaults` под ключом `photosFolder`). Если она пропала с диска, берётся пункт 3. Эту папку приложение не создаёт, не наполняет seed'ом и не помечает маркером.
+3. Иначе `~/Library/Application Support/Keepset/photos`. Если она пустая, туда копируется seed из ресурсов бандла.
+
+`PhotoStore.chooseFolder(_:)` запоминает выбор, подменяет папку, возвращает в Sandbox, сбрасывает фильтр и Undo и перечитывает диск. `useDefaultFolder()` забывает выбор и возвращается к пункту 3. Отметки у каждой папки свои, поэтому при возврате они на месте. Приложение не в App Sandbox ОС (в entitlements только Фототека), так что обычного пути достаточно, security-scoped bookmarks не нужны. `KEEPSET_PHOTOS_DIR` при запуске приоритетнее сохранённого выбора.
 
 Соседние папки `photos/` приложение больше не ищет. Раньше оно поднималось вверх от cwd и бандла, а на регистронезависимой APFS под это имя подходит и `~/Photos`.
 
 Seed — те же демо-файлы из `photos/`, они ещё и кладутся в бандл как resources. Reset Demo Photos стирает текущую папку и `.Trash`, затем копирует seed заново.
 
-Reset удаляет файлы навсегда, поэтому работает только в папке с маркером `.keepset-sandbox`. Его ставит само приложение (Application Support или созданная им папка из env), у репозиторной `photos/` он лежит в git. В папке без маркера Reset показывает ошибку и ничего не трогает.
+Reset удаляет файлы навсегда, поэтому работает только в папке с маркером `.keepset-sandbox`. Его ставит само приложение (Application Support или созданная им папка из env), у репозиторной `photos/` он лежит в git. В папке без маркера Reset показывает ошибку и ничего не трогает. Выбранную пользователем папку приложение никогда не помечает, поэтому Reset для неё выключен (`PhotoStore.isSandboxFolder`) и нужен только для демо-песочницы.
 
 Файлы внутри `.app` приложение не двигает и не удаляет (`canMutate`).
 
@@ -107,8 +112,9 @@ KeepsetApp
 
 | Файл | Роль |
 |---|---|
-| `KeepsetApp.swift` | Точка входа, окно, меню Sandbox, `PhotoStore` как `@State` |
+| `KeepsetApp.swift` | Точка входа, окно, меню Sandbox (Choose Folder…, Use Default Folder), `PhotoStore` как `@State` |
 | `PhotoStore.swift` | Режимы, фильтр All/Keep/Delete, выбор, жесты диапазона, keep/restore |
+| `FolderPanel.swift` | `NSOpenPanel` для выбора папки |
 | `PhotoLibrary.swift` | Резолв папки, чтение, move в `.Trash` / обратно, reset seed |
 | `CameraRollLibrary.swift` | Доступ к Фототеке, fetch PHAsset, удаление в Recently Deleted |
 | `Photo.swift` | Модель: id, source (file/asset), filename, modifiedAt |

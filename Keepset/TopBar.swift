@@ -207,6 +207,10 @@ private struct FolderPicker: View {
             }
             .pickerStyle(.inline)
             .labelsHidden()
+            Divider()
+            Button("Choose Folder…") {
+                Task { await store.chooseFolderWithPanel() }
+            }
         } label: {
             HStack(spacing: 5) {
                 Text(store.mode.title)

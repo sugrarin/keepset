@@ -23,9 +23,11 @@
 		75F0C8067C857237E790AB1B /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8877BD44435EA7D74460BCE /* TestSupport.swift */; };
 		8247EC26EA6050029F48F0BF /* KeepsetApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */; };
 		89BE6D0D071AD207720EED03 /* PhotoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCCF4AA3154B23FD98713A4 /* PhotoStore.swift */; };
+		B3DBC52011887BE88548AD45 /* FolderChoiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652649F912A405B8EAF0D14A /* FolderChoiceTests.swift */; };
 		B65E7ED004192F121BD59A3A /* WorkingDirectoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C3A7E3401C55DC5220BC40 /* WorkingDirectoryTests.swift */; };
 		B6AD510630C9AFD2E12BE03F /* SelectionFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F82D2F6A30A24F4F1F0868F2 /* SelectionFile.swift */; };
 		B9C82F246DFB8539509A72F1 /* SelectionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E023E399B4B53668CCDC2954 /* SelectionPersistenceTests.swift */; };
+		BCB4D829AFB0890E6CC472B9 /* FolderPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49646E22F0695868DF61124 /* FolderPanel.swift */; };
 		BDD6E3A4EBE9C0828FC44A6C /* PhotoLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */; };
 		BEDF81CDFCED4D546D2A8DBC /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B390205C039C743924283F7 /* PhotoCell.swift */; };
 		D1A135A16B1B9A9FB0F02224 /* CameraRollLoadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27BE721FA6CDD49D13A9D35 /* CameraRollLoadingTests.swift */; };
@@ -51,6 +53,7 @@
 		5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRollLibrary.swift; sourceTree = "<group>"; };
 		5E0509B54DB3DDC3CA10BAF3 /* PhotoGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGridView.swift; sourceTree = "<group>"; };
 		638550F872EADB57AA06CDAE /* Keepset.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Keepset.entitlements; sourceTree = "<group>"; };
+		652649F912A405B8EAF0D14A /* FolderChoiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderChoiceTests.swift; sourceTree = "<group>"; };
 		65497FAB9A75270BDF0CDD89 /* PhotoLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibrary.swift; sourceTree = "<group>"; };
 		86E9F8DA6C1FAA5551849910 /* GridGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridGeometryTests.swift; sourceTree = "<group>"; };
 		8A5F50CBF56E0534FA68CECE /* ThumbnailLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailLoaderTests.swift; sourceTree = "<group>"; };
@@ -68,6 +71,7 @@
 		E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepsetApp.swift; sourceTree = "<group>"; };
 		E77EEBE2DCA89E69A64EDB13 /* KeepsetTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeepsetTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8877BD44435EA7D74460BCE /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		F49646E22F0695868DF61124 /* FolderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPanel.swift; sourceTree = "<group>"; };
 		F82D2F6A30A24F4F1F0868F2 /* SelectionFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionFile.swift; sourceTree = "<group>"; };
 		FD1976260F852991A8990722 /* ThumbnailLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailLoader.swift; sourceTree = "<group>"; };
 		FD42635FA44A4C8F6F5539DC /* photos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = photos; sourceTree = SOURCE_ROOT; };
@@ -80,6 +84,7 @@
 				0FC711248D9B602FFF749052 /* Assets.xcassets */,
 				5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */,
 				D1C83866CFBB3CEFD94D3FF1 /* ContentView.swift */,
+				F49646E22F0695868DF61124 /* FolderPanel.swift */,
 				8E78D8233FFDADF7FCE43652 /* GridGeometry.swift */,
 				638550F872EADB57AA06CDAE /* Keepset.entitlements */,
 				E65F4CB007EFC92CC7C031C8 /* KeepsetApp.swift */,
@@ -101,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				C27BE721FA6CDD49D13A9D35 /* CameraRollLoadingTests.swift */,
+				652649F912A405B8EAF0D14A /* FolderChoiceTests.swift */,
 				86E9F8DA6C1FAA5551849910 /* GridGeometryTests.swift */,
 				E023E399B4B53668CCDC2954 /* SelectionPersistenceTests.swift */,
 				E8877BD44435EA7D74460BCE /* TestSupport.swift */,
@@ -220,6 +226,7 @@
 			files = (
 				386418C80303A6C00D9FCBCB /* CameraRollLibrary.swift in Sources */,
 				6B9D4D83C71B8F2F0052A156 /* ContentView.swift in Sources */,
+				BCB4D829AFB0890E6CC472B9 /* FolderPanel.swift in Sources */,
 				5AFB837C53D524D56BA3BC99 /* GridGeometry.swift in Sources */,
 				8247EC26EA6050029F48F0BF /* KeepsetApp.swift in Sources */,
 				D551DE08151B7DD0BAACF3F7 /* Photo.swift in Sources */,
@@ -240,6 +247,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D1A135A16B1B9A9FB0F02224 /* CameraRollLoadingTests.swift in Sources */,
+				B3DBC52011887BE88548AD45 /* FolderChoiceTests.swift in Sources */,
 				2D0B757D2B1B5FD4665D0599 /* GridGeometryTests.swift in Sources */,
 				B9C82F246DFB8539509A72F1 /* SelectionPersistenceTests.swift in Sources */,
 				75F0C8067C857237E790AB1B /* TestSupport.swift in Sources */,

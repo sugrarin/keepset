@@ -30,7 +30,8 @@ final class TestEnvironment {
             folder: folder ?? FolderPhotoLibrary(directory: photosDirectory),
             cameraRoll: cameraRoll,
             selectionStorage: SelectionFile(url: selectionURL),
-            defaults: defaults
+            defaults: defaults,
+            resolveDefaultDirectory: { [photosDirectory] in photosDirectory }
         )
     }
 

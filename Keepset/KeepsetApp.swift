@@ -21,7 +21,16 @@ struct KeepsetApp: App {
                     Task { await store.resetSandbox() }
                 }
                 .keyboardShortcut("r", modifiers: [.command, .shift])
-                .disabled(WorkingPhotosDirectory.seedURL == nil)
+                .disabled(WorkingPhotosDirectory.seedURL == nil || !store.isSandboxFolder)
+
+                Button("Choose Folder…") {
+                    Task { await store.chooseFolderWithPanel() }
+                }
+                .keyboardShortcut("o", modifiers: .command)
+
+                Button("Use Default Folder") {
+                    Task { await store.useDefaultFolder() }
+                }
 
                 Button("Show Photos Folder") {
                     NSWorkspace.shared.open(store.directory)
