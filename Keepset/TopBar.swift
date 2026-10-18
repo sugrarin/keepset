@@ -23,23 +23,14 @@ struct TopBar: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            HStack(spacing: 12) {
-                gridSizeSlider
-                TileShapeToggle()
-                if store.mode == .sandbox || store.mode == .cameraRoll {
-                    FilterTabs()
-                }
-                Spacer(minLength: 0)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
             FolderPicker()
-
-            HStack(spacing: 8) {
-                Spacer(minLength: 0)
-                trailingActions
+            GridSizeSlider()
+            TileShapeToggle()
+            if store.mode == .sandbox || store.mode == .cameraRoll {
+                FilterTabs()
             }
-            .frame(maxWidth: .infinity, alignment: .trailing)
+            Spacer(minLength: 0)
+            trailingActions
         }
         .font(.system(size: BarControl.fontSize, weight: .medium))
         .foregroundStyle(.white)
@@ -49,28 +40,6 @@ struct TopBar: View {
         .overlay(alignment: .bottom) {
             Divider().opacity(0.12)
         }
-    }
-
-    private var gridSizeSlider: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "square.grid.4x3.fill")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.7))
-            Slider(value: invertedColumnCount, in: 3...10, step: 1)
-                .controlSize(.small)
-                .frame(width: 140)
-                .tint(Theme.accent)
-            Image(systemName: "square.grid.2x2")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.7))
-        }
-    }
-
-    private var invertedColumnCount: Binding<Double> {
-        Binding(
-            get: { 13 - store.columnCount },
-            set: { store.columnCount = 13 - $0 }
-        )
     }
 
     @ViewBuilder
@@ -163,6 +132,64 @@ struct TopBar: View {
                 .contentShape(BarControl.shape)
         }
         .buttonStyle(FillHitButtonStyle())
+    }
+}
+
+private struct GridSizeSlider: View {
+    @Environment(PhotoStore.self) private var store
+
+    private let trackWidth: CGFloat = 112
+    private let thumbWidth: CGFloat = 30
+    private let steps = 3.0...10.0
+
+    /// Slider position runs opposite to the column count: further right means bigger tiles.
+    private var position: Double { 13 - store.columnCount }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "square.grid.4x3.fill")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.7))
+            track
+            Image(systemName: "square.grid.2x2")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.7))
+        }
+        .padding(.horizontal, 12)
+        .frame(height: BarControl.height)
+        .background(Theme.surface, in: BarControl.shape)
+    }
+
+    private var track: some View {
+        let fraction = (position - steps.lowerBound) / (steps.upperBound - steps.lowerBound)
+        return ZStack(alignment: .leading) {
+            Color.clear
+            BarControl.innerShape
+                .fill(Theme.canvas)
+                .frame(width: thumbWidth)
+                .padding(.vertical, BarControl.inset)
+                .offset(x: fraction * (trackWidth - thumbWidth))
+                .animation(.snappy(duration: 0.15), value: position)
+        }
+        .frame(width: trackWidth)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 0).onChanged { drag in
+                let fraction = (drag.location.x - thumbWidth / 2) / (trackWidth - thumbWidth)
+                let raw = steps.lowerBound + min(max(fraction, 0), 1) * (steps.upperBound - steps.lowerBound)
+                store.columnCount = 13 - raw.rounded()
+            }
+        )
+        .accessibilityElement()
+        .accessibilityLabel("Grid size")
+        .accessibilityValue("\(store.columns) columns")
+        .accessibilityAdjustableAction { direction in
+            switch direction {
+            case .increment: store.columnCount = max(store.columnCount - 1, 3)
+            case .decrement: store.columnCount = min(store.columnCount + 1, 10)
+            @unknown default: break
+            }
+        }
     }
 }
 
