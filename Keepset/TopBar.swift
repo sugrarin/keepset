@@ -4,9 +4,17 @@ private enum BarControl {
     static let height: CGFloat = 38
     static let radius: CGFloat = 10
     static let barHeight: CGFloat = 58
+    /// Gap between a grouped control's edge and the segments or button inside it.
+    static let inset: CGFloat = 4
+    static let fontSize: CGFloat = 13
+    static let buttonMinWidth: CGFloat = 84
 
     static var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: radius, style: .continuous)
+    }
+
+    static var innerShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: radius - inset, style: .continuous)
     }
 }
 
@@ -33,7 +41,7 @@ struct TopBar: View {
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .font(.system(size: 13, weight: .medium))
+        .font(.system(size: BarControl.fontSize, weight: .medium))
         .foregroundStyle(.white)
         .padding(.horizontal, 16)
         .frame(height: BarControl.barHeight)
@@ -85,15 +93,33 @@ struct TopBar: View {
             .disabled(store.isBusy)
             .allowsHitTesting(!store.isBusy)
         } else if store.mode == .sandbox, let deletion = store.lastDeletion {
-            Text("Deleted \(deletion.count)")
+            deletedPlaque(count: deletion.count)
+        }
+    }
+
+    private func deletedPlaque(count: Int) -> some View {
+        HStack(spacing: 12) {
+            Text("Deleted \(count)")
                 .monospacedDigit()
-                .foregroundStyle(.white.opacity(0.7))
-            chromeButton("Undo", fill: Theme.accent, foreground: Theme.onAccent, emphasized: true) {
+                .padding(.leading, 10)
+            Button {
                 Task { await store.undoDelete() }
+            } label: {
+                Text("Undo")
+                    .font(.system(size: BarControl.fontSize, weight: .semibold))
+                    .padding(.horizontal, 14)
+                    .frame(maxHeight: .infinity)
+                    .foregroundStyle(Theme.onAccent)
+                    .background(Theme.accent, in: BarControl.innerShape)
+                    .contentShape(BarControl.innerShape)
             }
+            .buttonStyle(FillHitButtonStyle())
             .disabled(store.isBusy)
             .allowsHitTesting(!store.isBusy)
         }
+        .padding(BarControl.inset)
+        .frame(height: BarControl.height)
+        .background(Theme.surface, in: BarControl.shape)
     }
 
     private var commitButton: some View {
@@ -102,12 +128,13 @@ struct TopBar: View {
         } label: {
             VStack(spacing: 1) {
                 Text("Keep \(store.selectedCount)")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.system(size: BarControl.fontSize, weight: .semibold))
                 Text("Delete \(store.pendingDeleteCount)")
                     .font(.system(size: 10, weight: .medium))
                     .opacity(0.55)
             }
             .padding(.horizontal, 14)
+            .frame(minWidth: BarControl.buttonMinWidth)
             .frame(height: BarControl.height)
             .foregroundStyle(Theme.onAccent)
             .background(Theme.accent, in: BarControl.shape)
@@ -127,8 +154,9 @@ struct TopBar: View {
     ) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 13, weight: emphasized ? .semibold : .medium))
+                .font(.system(size: BarControl.fontSize, weight: emphasized ? .semibold : .medium))
                 .padding(.horizontal, 14)
+                .frame(minWidth: BarControl.buttonMinWidth)
                 .frame(height: BarControl.height)
                 .foregroundStyle(foreground)
                 .background(fill, in: BarControl.shape)
@@ -153,7 +181,7 @@ private struct FolderPicker: View {
         } label: {
             HStack(spacing: 5) {
                 Text(store.mode.title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: BarControl.fontSize, weight: .semibold))
                 Image(systemName: "chevron.up.chevron.down")
                     .font(.system(size: 9, weight: .bold))
                     .foregroundStyle(.white.opacity(0.55))
@@ -186,7 +214,7 @@ private struct TileShapeToggle: View {
             option(.square, symbol: "square", help: "Square tiles")
             option(.original, symbol: "rectangle.portrait", help: "Original shape")
         }
-        .padding(3)
+        .padding(BarControl.inset)
         .frame(height: BarControl.height)
         .background(Theme.surface, in: BarControl.shape)
     }
@@ -198,11 +226,11 @@ private struct TileShapeToggle: View {
         } label: {
             Image(systemName: symbol)
                 .font(.system(size: 12, weight: .semibold))
-                .frame(width: 32)
+                .frame(width: 34)
                 .frame(maxHeight: .infinity)
                 .foregroundStyle(.white.opacity(selected ? 0.95 : 0.6))
-                .background(selected ? Theme.canvas : Color.clear, in: Capsule())
-                .contentShape(Capsule())
+                .background(selected ? Theme.canvas : Color.clear, in: BarControl.innerShape)
+                .contentShape(BarControl.innerShape)
         }
         .buttonStyle(FillHitButtonStyle())
         .help(help)
@@ -220,7 +248,7 @@ private struct FilterTabs: View {
             tab(.keep, title: "Keep", count: store.selectedCount)
             tab(.delete, title: "Delete", count: store.pendingDeleteCount)
         }
-        .padding(3)
+        .padding(BarControl.inset)
         .frame(height: BarControl.height)
         .background(Theme.surface, in: BarControl.shape)
     }
@@ -232,13 +260,13 @@ private struct FilterTabs: View {
             store.setFilter(filter)
         } label: {
             Text("\(title) \(count)")
-                .font(.system(size: 12, weight: selected ? .semibold : .medium))
+                .font(.system(size: BarControl.fontSize, weight: selected ? .semibold : .medium))
                 .monospacedDigit()
                 .padding(.horizontal, 12)
                 .frame(maxHeight: .infinity)
                 .foregroundStyle(.white.opacity(selected ? 0.95 : 0.72))
-                .background(selected ? Theme.canvas : Color.clear, in: Capsule())
-                .contentShape(Capsule())
+                .background(selected ? Theme.canvas : Color.clear, in: BarControl.innerShape)
+                .contentShape(BarControl.innerShape)
                 .opacity(enabled ? 1 : 0.38)
         }
         .buttonStyle(FillHitButtonStyle())

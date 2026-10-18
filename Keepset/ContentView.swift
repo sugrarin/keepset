@@ -76,6 +76,9 @@ struct ContentView: View {
             Button("Select All") { store.selectAll() }
                 .keyboardShortcut("a", modifiers: .command)
                 .hidden()
+            Button("Undo") { Task { await store.undoDelete() } }
+                .keyboardShortcut("z", modifiers: .command)
+                .hidden()
             Button("Escape") { handleEscape() }
                 .keyboardShortcut(.escape, modifiers: [])
                 .hidden()
