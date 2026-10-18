@@ -163,7 +163,9 @@ private struct GridSizeSlider: View {
     private var track: some View {
         let fraction = (position - steps.lowerBound) / (steps.upperBound - steps.lowerBound)
         return ZStack(alignment: .leading) {
-            Color.clear
+            Capsule()
+                .fill(.white.opacity(0.2))
+                .frame(height: 2)
             BarControl.innerShape
                 .fill(Theme.canvas)
                 .frame(width: thumbWidth)
@@ -214,14 +216,15 @@ private struct FolderPicker: View {
                     .foregroundStyle(.white.opacity(0.55))
             }
             .foregroundStyle(.white)
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 12)
             .frame(height: BarControl.height)
-            .contentShape(Rectangle())
+            .contentShape(BarControl.shape)
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .buttonStyle(.plain)
         .fixedSize()
+        .background(Theme.surface, in: BarControl.shape)
         .help("Choose a working folder")
     }
 
