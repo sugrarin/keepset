@@ -139,7 +139,7 @@ private struct GridSizeSlider: View {
     @Environment(PhotoStore.self) private var store
 
     private let trackWidth: CGFloat = 112
-    private let thumbWidth: CGFloat = 30
+    private let thumbWidth: CGFloat = 18
     private let steps = 3.0...10.0
 
     /// Slider position runs opposite to the column count: further right means bigger tiles.
@@ -212,14 +212,14 @@ private struct FolderPicker: View {
                 Task { await store.chooseFolderWithPanel() }
             }
         } label: {
-            HStack(spacing: 5) {
-                Text(store.mode.title)
-                    .font(.system(size: BarControl.fontSize, weight: .semibold))
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.55))
-            }
-            .foregroundStyle(.white)
+            // One Text: a menu label made of an Image and a Text puts the image first.
+            (Text(store.mode.title)
+                .font(.system(size: BarControl.fontSize, weight: .semibold))
+                .foregroundStyle(.white)
+                + Text("  ")
+                + Text(Image(systemName: "chevron.up.chevron.down"))
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.white.opacity(0.55)))
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
