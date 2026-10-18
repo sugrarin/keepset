@@ -9,8 +9,8 @@ APP="$BUILD/Build/Products/Release/Keepset.app"
 xcodebuild -project Keepset.xcodeproj -scheme Keepset -configuration Release \
     -derivedDataPath "$BUILD" build
 
-# The demo seed must hold only images: the working copy's trash and marker are local state.
-rm -rf "$APP/Contents/Resources/photos/.Trash" "$APP/Contents/Resources/photos/.keepset-sandbox"
+# Demo photos are for development only; the public build starts with an empty sandbox.
+rm -rf "$APP/Contents/Resources/photos"
 codesign --force --sign - --options runtime --entitlements Keepset/Keepset.entitlements "$APP"
 codesign --verify --deep --strict "$APP"
 

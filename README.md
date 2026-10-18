@@ -31,7 +31,7 @@ xattr -dr com.apple.quarantine /Applications/Keepset.app
 
 ## Usage
 
-On first launch Keepset opens a Sandbox folder with a few demo photos, so you can try it without touching your own. To work on your own folder, set `KEEPSET_PHOTOS_DIR` to its path before launching:
+Keepset works with two sources: the Camera Roll and a Sandbox folder. The Sandbox is `~/Library/Application Support/Keepset/photos`: copy photos there (Sandbox → Show Photos Folder opens it) and come back to the app. To work on another folder, set `KEEPSET_PHOTOS_DIR` to its path before launching:
 
 ```bash
 open -n --env KEEPSET_PHOTOS_DIR=$HOME/Pictures/shoot /Applications/Keepset.app
@@ -46,7 +46,6 @@ Deleting in a Sandbox folder moves files to a `.Trash` folder inside it, never t
 | Undo the last delete | ⌘Z |
 | Clear selection | Esc |
 | Open Trash | ⇧⌘T |
-| Reset demo photos | ⇧⌘R |
 
 ## Build from source
 
@@ -62,10 +61,6 @@ See [project.md](project.md) for behavior and architecture.
 ## Third-party software
 
 Keepset has no third-party libraries. It uses only Apple system frameworks: SwiftUI, AppKit, ImageIO and Photos.
-
-## Demo photos
-
-The photos bundled with the app are for demonstration only and belong to their authors. They are not covered by the MIT license.
 
 ## Support
 

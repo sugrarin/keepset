@@ -36,9 +36,11 @@ struct ContentView: View {
                     case .trash:
                         EmptyTrashView()
                     case .sandbox where store.photos.isEmpty:
-                        EmptySandboxView {
-                            Task { await store.resetSandbox() }
-                        }
+                        EmptySandboxView(
+                            canReset: WorkingPhotosDirectory.seedURL != nil,
+                            onReset: { Task { await store.resetSandbox() } },
+                            onShowFolder: { NSWorkspace.shared.open(store.directory) }
+                        )
                     case .cameraRoll:
                         EmptyCameraRollView(access: store.cameraRollAccess) {
                             openPhotosPrivacySettings()
@@ -93,6 +95,9 @@ struct ContentView: View {
             previewPhoto = nil
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            if store.mode == .sandbox, store.photos.isEmpty {
+                Task { await store.load() }
+            }
             guard store.mode == .cameraRoll, store.cameraRollAccess != .authorized else { return }
             Task { await store.loadCameraRoll() }
         }
@@ -186,7 +191,9 @@ private struct EmptyCameraRollView: View {
 }
 
 private struct EmptySandboxView: View {
+    let canReset: Bool
     let onReset: () -> Void
+    let onShowFolder: () -> Void
 
     var body: some View {
         VStack(spacing: 12) {
@@ -195,9 +202,9 @@ private struct EmptySandboxView: View {
                 .foregroundStyle(.white.opacity(0.55))
             Text("No photos in the sandbox")
                 .font(.title3.weight(.medium))
-            Text("Reset to restore the demo folder.")
+            Text(canReset ? "Reset to restore the demo folder." : "Add photos to the sandbox folder and come back.")
                 .foregroundStyle(.secondary)
-            Button("Reset Demo Photos", action: onReset)
+            Button(canReset ? "Reset Demo Photos" : "Show Folder", action: canReset ? onReset : onShowFolder)
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.accent)
                 .foregroundStyle(Theme.onAccent)

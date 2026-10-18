@@ -21,6 +21,7 @@ struct KeepsetApp: App {
                     Task { await store.resetSandbox() }
                 }
                 .keyboardShortcut("r", modifiers: [.command, .shift])
+                .disabled(WorkingPhotosDirectory.seedURL == nil)
 
                 Button("Show Photos Folder") {
                     NSWorkspace.shared.open(store.directory)
