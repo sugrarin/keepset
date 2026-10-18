@@ -26,7 +26,7 @@ struct TopBar: View {
             FolderPicker()
             GridSizeSlider()
             TileShapeToggle()
-            if store.mode == .sandbox || store.mode == .cameraRoll {
+            if store.mode == .folder || store.mode == .cameraRoll {
                 FilterTabs()
             }
             Spacer(minLength: 0)
@@ -44,7 +44,7 @@ struct TopBar: View {
 
     @ViewBuilder
     private var trailingActions: some View {
-        if store.mode == .sandbox || store.mode == .cameraRoll, store.selectedCount > 0 {
+        if store.mode == .folder || store.mode == .cameraRoll, store.selectedCount > 0 {
             chromeButton("Cancel", fill: Theme.surface) {
                 store.cancel()
             }
@@ -61,7 +61,7 @@ struct TopBar: View {
             }
             .disabled(store.isBusy)
             .allowsHitTesting(!store.isBusy)
-        } else if store.mode == .sandbox, let deletion = store.lastDeletion {
+        } else if store.mode == .folder, let deletion = store.lastDeletion {
             deletedPlaque(count: deletion.count)
         }
     }
@@ -202,7 +202,7 @@ private struct FolderPicker: View {
         Menu {
             Picker("Workspace", selection: workspaceBinding) {
                 ForEach(WorkspaceMode.allCases) { mode in
-                    Text(mode.title).tag(mode)
+                    Text(store.title(for: mode)).tag(mode)
                 }
             }
             .pickerStyle(.inline)
@@ -213,7 +213,7 @@ private struct FolderPicker: View {
             }
         } label: {
             // One Text: a menu label made of an Image and a Text puts the image first.
-            (Text(store.mode.title)
+            (Text(shortTitle)
                 .font(.system(size: BarControl.fontSize, weight: .semibold))
                 .foregroundStyle(.white)
                 + Text("  ")
@@ -229,6 +229,11 @@ private struct FolderPicker: View {
         .frame(height: BarControl.height)
         .background(Theme.surface, in: BarControl.shape)
         .help("Choose a working folder")
+    }
+
+    private var shortTitle: String {
+        let title = store.title(for: store.mode)
+        return title.count > 24 ? title.prefix(23) + "…" : title
     }
 
     private var workspaceBinding: Binding<WorkspaceMode> {

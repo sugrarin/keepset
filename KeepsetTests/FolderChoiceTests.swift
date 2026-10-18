@@ -49,7 +49,7 @@ struct FolderChoiceTests {
 
         await store.chooseFolder(chosen)
 
-        #expect(store.mode == .sandbox)
+        #expect(store.mode == .folder)
     }
 
     @Test func marksSurviveSwitchingBackToAFolder() async throws {
@@ -76,40 +76,39 @@ struct FolderChoiceTests {
         #expect(env.defaults.string(forKey: PhotoStore.photosFolderKey) == chosen.path)
     }
 
-    @Test func chosenFolderIsNeverMarkedAsSandbox() async throws {
+    @Test func startsWithoutAFolderUntilOneIsChosen() async throws {
         let env = try TestEnvironment(files: [])
-        let store = env.makeStore()
+        let store = env.makeStoreWithoutFolder()
+
+        await store.load()
+
+        #expect(!store.hasFolder)
+        #expect(store.directory == nil)
+        #expect(store.photos.isEmpty)
+        #expect(store.title(for: .folder) == "No Folder")
+    }
+
+    @Test func choosingAFolderWorksFromTheEmptyStart() async throws {
+        let env = try TestEnvironment(files: [])
+        let store = env.makeStoreWithoutFolder()
         let chosen = try makeFolder(in: env, named: "shoot", files: ["x.jpg"])
 
         await store.chooseFolder(chosen)
-        await store.resetSandbox()
 
-        #expect(!WorkingPhotosDirectory.isSandbox(chosen))
+        #expect(store.hasFolder)
         #expect(store.photos.map(\.filename) == ["x.jpg"])
-        #expect(store.errorMessage != nil)
     }
 
-    @Test func defaultFolderIsRestoredAndForgetsTheChoice() async throws {
-        let env = try TestEnvironment(files: ["a.jpg"])
-        let store = env.makeStore()
-        let chosen = try makeFolder(in: env, named: "shoot", files: ["x.jpg"])
-        await store.chooseFolder(chosen)
-
-        await store.useDefaultFolder()
-
-        #expect(store.directory == env.photosDirectory)
-        #expect(store.photos.map(\.filename) == ["a.jpg"])
-        #expect(env.defaults.string(forKey: PhotoStore.photosFolderKey) == nil)
-    }
-
-    @Test func resetIsAllowedOnlyInMarkedFolders() async throws {
+    @Test func folderTabIsNamedAfterTheFolder() async throws {
         let env = try TestEnvironment(files: [])
         let store = env.makeStore()
-        try Data().write(to: env.photosDirectory.appendingPathComponent(WorkingPhotosDirectory.sandboxMarker))
-        #expect(store.isSandboxFolder)
+        let chosen = try makeFolder(in: env, named: "shoot", files: [])
 
-        await store.chooseFolder(try makeFolder(in: env, named: "shoot", files: []))
+        #expect(store.title(for: .folder) == "photos")
+        await store.chooseFolder(chosen)
 
-        #expect(!store.isSandboxFolder)
+        #expect(store.title(for: .folder) == "shoot")
+        #expect(store.title(for: .cameraRoll) == "Camera Roll")
+        #expect(store.title(for: .trash) == "Trash")
     }
 }

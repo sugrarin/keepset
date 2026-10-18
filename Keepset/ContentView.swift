@@ -35,18 +35,16 @@ struct ContentView: View {
                     switch store.mode {
                     case .trash:
                         EmptyTrashView()
-                    case .sandbox where store.photos.isEmpty:
-                        EmptySandboxView(
-                            canReset: WorkingPhotosDirectory.seedURL != nil && store.isSandboxFolder,
-                            onReset: { Task { await store.resetSandbox() } },
-                            onShowFolder: { NSWorkspace.shared.open(store.directory) },
+                    case .folder where store.photos.isEmpty:
+                        EmptyFolderView(
+                            hasFolder: store.hasFolder,
                             onChooseFolder: { Task { await store.chooseFolderWithPanel() } }
                         )
                     case .cameraRoll:
                         EmptyCameraRollView(access: store.cameraRollAccess) {
                             openPhotosPrivacySettings()
                         }
-                    case .sandbox:
+                    case .folder:
                         EmptyView()
                     }
                 }
@@ -96,7 +94,7 @@ struct ContentView: View {
             previewPhoto = nil
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
-            if store.mode == .sandbox, store.photos.isEmpty {
+            if store.mode == .folder, store.hasFolder, store.photos.isEmpty {
                 Task { await store.load() }
             }
             guard store.mode == .cameraRoll, store.cameraRollAccess != .authorized else { return }
@@ -114,11 +112,11 @@ struct ContentView: View {
 
     private func handleReturn() {
         switch store.mode {
-        case .sandbox where store.selectedCount > 0, .cameraRoll where store.selectedCount > 0:
+        case .folder where store.selectedCount > 0, .cameraRoll where store.selectedCount > 0:
             Task { await store.keep() }
         case .trash where store.selectedCount > 0:
             Task { await store.restoreSelected() }
-        case .sandbox, .cameraRoll, .trash:
+        case .folder, .cameraRoll, .trash:
             break
         }
     }
@@ -191,10 +189,8 @@ private struct EmptyCameraRollView: View {
     }
 }
 
-private struct EmptySandboxView: View {
-    let canReset: Bool
-    let onReset: () -> Void
-    let onShowFolder: () -> Void
+private struct EmptyFolderView: View {
+    let hasFolder: Bool
     let onChooseFolder: () -> Void
 
     var body: some View {
@@ -202,16 +198,15 @@ private struct EmptySandboxView: View {
             Image(systemName: "photo.on.rectangle.angled")
                 .font(.system(size: 42, weight: .light))
                 .foregroundStyle(.white.opacity(0.55))
-            Text("No photos in this folder")
+            Text(hasFolder ? "No photos in this folder" : "Choose a folder to start")
                 .font(.title3.weight(.medium))
-            Text(canReset ? "Reset to restore the demo folder." : "Choose a folder or add photos to this one and come back.")
+            Text(hasFolder ? "Add photos to it and come back, or choose another folder." : "Keepset sorts the photos in a folder you pick.")
                 .foregroundStyle(.secondary)
-            Button(canReset ? "Reset Demo Photos" : "Show Folder", action: canReset ? onReset : onShowFolder)
+            Button("Choose Folder…", action: onChooseFolder)
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.accent)
                 .foregroundStyle(Theme.onAccent)
                 .padding(.top, 6)
-            Button("Choose Folder…", action: onChooseFolder)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

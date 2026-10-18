@@ -30,8 +30,16 @@ final class TestEnvironment {
             folder: folder ?? FolderPhotoLibrary(directory: photosDirectory),
             cameraRoll: cameraRoll,
             selectionStorage: SelectionFile(url: selectionURL),
-            defaults: defaults,
-            resolveDefaultDirectory: { [photosDirectory] in photosDirectory }
+            defaults: defaults
+        )
+    }
+
+    func makeStoreWithoutFolder() -> PhotoStore {
+        PhotoStore(
+            folder: nil,
+            cameraRoll: cameraRoll,
+            selectionStorage: SelectionFile(url: selectionURL),
+            defaults: defaults
         )
     }
 
@@ -90,5 +98,4 @@ final class ThreadRecordingFolder: PhotoFolder, @unchecked Sendable {
     func moveToTrash(_ photos: [Photo]) throws { record(); try wrapped.moveToTrash(photos) }
     func restorePhotos(_ photos: [Photo]) throws { record(); try wrapped.restorePhotos(photos) }
     func emptyTrash() throws { record(); try wrapped.emptyTrash() }
-    func resetFromSeed() throws { record(); try wrapped.resetFromSeed() }
 }

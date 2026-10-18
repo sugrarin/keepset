@@ -38,7 +38,7 @@ struct SelectionPersistenceTests {
 
         store.setWorkspace(.trash)
         #expect(store.selectedIDs.isEmpty)
-        store.setWorkspace(.sandbox)
+        store.setWorkspace(.folder)
 
         #expect(store.selectedIDs == [store.photos[1].id])
     }

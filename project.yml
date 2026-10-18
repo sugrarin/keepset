@@ -15,9 +15,6 @@ targets:
       - path: Keepset
         excludes:
           - "**/.DS_Store"
-      - path: photos
-        type: folder
-        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.keepset.app
@@ -43,8 +40,6 @@ targets:
     scheme:
       testTargets:
         - KeepsetTests
-      environmentVariables:
-        KEEPSET_PHOTOS_DIR: $(SRCROOT)/photos
   KeepsetTests:
     type: bundle.unit-test
     platform: macOS

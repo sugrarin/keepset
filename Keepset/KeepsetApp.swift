@@ -16,25 +16,18 @@ struct KeepsetApp: App {
         .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(replacing: .newItem) {}
-            CommandMenu("Sandbox") {
-                Button("Reset Demo Photos") {
-                    Task { await store.resetSandbox() }
-                }
-                .keyboardShortcut("r", modifiers: [.command, .shift])
-                .disabled(WorkingPhotosDirectory.seedURL == nil || !store.isSandboxFolder)
-
+            CommandMenu("Folder") {
                 Button("Choose Folder…") {
                     Task { await store.chooseFolderWithPanel() }
                 }
                 .keyboardShortcut("o", modifiers: .command)
 
-                Button("Use Default Folder") {
-                    Task { await store.useDefaultFolder() }
+                Button("Show Folder in Finder") {
+                    if let directory = store.directory {
+                        NSWorkspace.shared.open(directory)
+                    }
                 }
-
-                Button("Show Photos Folder") {
-                    NSWorkspace.shared.open(store.directory)
-                }
+                .disabled(!store.hasFolder)
 
                 Button("Recently Deleted") {
                     store.openTrash()

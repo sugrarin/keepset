@@ -2,19 +2,11 @@ import Foundation
 import Observation
 
 enum WorkspaceMode: String, Equatable, Hashable, CaseIterable, Identifiable {
-    case sandbox
+    case folder
     case cameraRoll
     case trash
 
     var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .sandbox: "Sandbox"
-        case .cameraRoll: "Camera Roll"
-        case .trash: "Trash"
-        }
-    }
 }
 
 enum PhotoFilter: Equatable {
@@ -41,7 +33,7 @@ final class PhotoStore {
     var photos: [Photo] = []
     var cameraRollPhotos: [Photo] = []
     var trashedPhotos: [Photo] = []
-    var mode: WorkspaceMode = .sandbox
+    var mode: WorkspaceMode = .folder
     var columnCount: Double = 5
     var filter: PhotoFilter = .all
     var cameraRollAccess: PhotoAccess = .unknown
@@ -55,8 +47,7 @@ final class PhotoStore {
 
     /// Hearts per workspace, keyed by `selectionKey(for:)`, so switching folders keeps each one's work.
     private var selections: [String: Set<Photo.ID>]
-    private var folder: any PhotoFolder
-    private let resolveDefaultDirectory: () -> URL
+    private var folder: (any PhotoFolder)?
     private let cameraRoll: any CameraRoll
     private let selectionStorage: any SelectionStorage
     private let defaults: UserDefaults
@@ -70,11 +61,9 @@ final class PhotoStore {
     private static let tileShapeKey = "tileShape"
     static let photosFolderKey = "photosFolder"
 
-    var directory: URL { folder.directory }
+    var directory: URL? { folder?.directory }
 
-    var isSandboxFolder: Bool {
-        WorkingPhotosDirectory.isSandbox(directory)
-    }
+    var hasFolder: Bool { folder != nil }
 
     var selectedIDs: Set<Photo.ID> {
         get { selections[selectionKey(for: mode)] ?? [] }
@@ -83,7 +72,7 @@ final class PhotoStore {
 
     var workingPhotos: [Photo] {
         switch mode {
-        case .sandbox: photos
+        case .folder: photos
         case .cameraRoll: cameraRollPhotos
         case .trash: trashedPhotos
         }
@@ -91,7 +80,7 @@ final class PhotoStore {
 
     var displayedPhotos: [Photo] {
         switch mode {
-        case .sandbox, .cameraRoll:
+        case .folder, .cameraRoll:
             let pool = workingPhotos
             switch filter {
             case .all:
@@ -119,14 +108,12 @@ final class PhotoStore {
     var trashedCount: Int { trashedPhotos.count }
 
     init(
-        folder: any PhotoFolder,
+        folder: (any PhotoFolder)?,
         cameraRoll: any CameraRoll,
         selectionStorage: any SelectionStorage,
-        defaults: UserDefaults,
-        resolveDefaultDirectory: @escaping () -> URL = { WorkingPhotosDirectory.resolve(environment: [:]) }
+        defaults: UserDefaults
     ) {
         self.folder = folder
-        self.resolveDefaultDirectory = resolveDefaultDirectory
         self.cameraRoll = cameraRoll
         self.selectionStorage = selectionStorage
         self.defaults = defaults
@@ -136,9 +123,9 @@ final class PhotoStore {
 
     convenience init() {
         self.init(
-            folder: FolderPhotoLibrary(directory: WorkingPhotosDirectory.resolve(
-                savedFolder: UserDefaults.standard.string(forKey: Self.photosFolderKey)
-            )),
+            folder: WorkingPhotosDirectory
+                .existingFolder(atPath: UserDefaults.standard.string(forKey: Self.photosFolderKey))
+                .map { FolderPhotoLibrary(directory: $0) },
             cameraRoll: CameraRollLibrary(),
             selectionStorage: SelectionFile.standard,
             defaults: .standard
@@ -151,23 +138,21 @@ final class PhotoStore {
         await reloadFolder()
     }
 
+    func title(for workspace: WorkspaceMode) -> String {
+        switch workspace {
+        case .folder: directory?.lastPathComponent ?? "No Folder"
+        case .cameraRoll: "Camera Roll"
+        case .trash: "Trash"
+        }
+    }
+
     func chooseFolder(_ url: URL) async {
         guard !isBusy else { return }
         defaults.set(url.path, forKey: Self.photosFolderKey)
-        await switchFolder(to: url)
-    }
-
-    func useDefaultFolder() async {
-        guard !isBusy else { return }
-        defaults.removeObject(forKey: Self.photosFolderKey)
-        await switchFolder(to: resolveDefaultDirectory())
-    }
-
-    private func switchFolder(to url: URL) async {
         folder = FolderPhotoLibrary(directory: url)
         lastDeletion = nil
         filter = .all
-        mode = .sandbox
+        mode = .folder
         photos = []
         trashedPhotos = []
         await load()
@@ -189,7 +174,7 @@ final class PhotoStore {
     }
 
     func openTrash() {
-        setWorkspace(mode == .trash ? .sandbox : .trash)
+        setWorkspace(mode == .trash ? .folder : .trash)
     }
 
     func setFilter(_ next: PhotoFilter) {
@@ -219,7 +204,7 @@ final class PhotoStore {
     }
 
     func handleDragSelect(at photo: Photo) {
-        guard mode == .trash || ((mode == .sandbox || mode == .cameraRoll) && filter == .all) else { return }
+        guard mode == .trash || ((mode == .folder || mode == .cameraRoll) && filter == .all) else { return }
         if dragAnchorID == nil {
             dragAnchorID = photo.id
             dragSnapshot = selectedIDs
@@ -272,7 +257,7 @@ final class PhotoStore {
     }
 
     func keep() async {
-        guard mode == .sandbox || mode == .cameraRoll, !selectedIDs.isEmpty, !isBusy else { return }
+        guard mode == .folder || mode == .cameraRoll, !selectedIDs.isEmpty, !isBusy else { return }
         // Captured up front: the user may switch folders while the move is in flight.
         let workspace = mode
         let keptIDs = selectedIDs
@@ -283,9 +268,10 @@ final class PhotoStore {
         do {
             if !toDelete.isEmpty {
                 switch workspace {
-                case .sandbox:
-                    let folder = folder
-                    try await offMain { try folder.moveToTrash(toDelete) }
+                case .folder:
+                    if let folder {
+                        try await offMain { try folder.moveToTrash(toDelete) }
+                    }
                 case .cameraRoll:
                     try await cameraRoll.deletePhotos(toDelete)
                     cameraRollPhotos.removeAll { !keptIDs.contains($0.id) }
@@ -302,7 +288,7 @@ final class PhotoStore {
         } catch {
             errorMessage = error.localizedDescription
         }
-        if workspace == .sandbox {
+        if workspace == .folder {
             await reloadFolder()
             let moved = trashedPhotos.filter { !trashedBefore.contains($0.id) }
             lastDeletion = moved.isEmpty ? nil : Deletion(trashed: moved, kept: keptIDs)
@@ -311,18 +297,17 @@ final class PhotoStore {
     }
 
     func undoDelete() async {
-        guard let deletion = lastDeletion, !isBusy else { return }
+        guard let deletion = lastDeletion, let folder, !isBusy else { return }
         lastDeletion = nil
         isBusy = true
         defer { isBusy = false }
         do {
-            let folder = folder
             try await offMain { try folder.restorePhotos(deletion.trashed) }
         } catch {
             errorMessage = error.localizedDescription
         }
         await reloadFolder()
-        setSelection(deletion.kept, for: .sandbox)
+        setSelection(deletion.kept, for: .folder)
         saveSelections()
     }
 
@@ -356,13 +341,12 @@ final class PhotoStore {
     }
 
     func restoreSelected() async {
-        guard mode == .trash, !selectedIDs.isEmpty, !isBusy else { return }
+        guard mode == .trash, let folder, !selectedIDs.isEmpty, !isBusy else { return }
         lastDeletion = nil
         let toRestore = trashedPhotos.filter { selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
         do {
-            let folder = folder
             try await offMain { try folder.restorePhotos(toRestore) }
             setSelection([], for: .trash)
         } catch {
@@ -373,12 +357,11 @@ final class PhotoStore {
     }
 
     func emptyTrash() async {
-        guard mode == .trash, !isBusy else { return }
+        guard mode == .trash, let folder, !isBusy else { return }
         lastDeletion = nil
         isBusy = true
         defer { isBusy = false }
         do {
-            let folder = folder
             try await offMain { try folder.emptyTrash() }
             setSelection([], for: .trash)
         } catch {
@@ -388,34 +371,19 @@ final class PhotoStore {
         saveSelections()
     }
 
-    func resetSandbox() async {
-        guard !isBusy else { return }
-        lastDeletion = nil
-        isBusy = true
-        defer { isBusy = false }
-        do {
-            let folder = folder
-            try await offMain { try folder.resetFromSeed() }
-            setSelection([], for: .sandbox)
-            setSelection([], for: .trash)
-            filter = .all
-            mode = .sandbox
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        await reloadFolder()
-        saveSelections()
-    }
-
     private func reloadFolder() async {
-        let folder = folder
+        guard let folder else {
+            photos = []
+            trashedPhotos = []
+            return
+        }
         do {
             let (live, trashed) = try await offMain {
                 (try folder.loadPhotos(), try folder.loadTrashedPhotos())
             }
             photos = live
             trashedPhotos = trashed
-            pruneSelection(for: .sandbox, to: live)
+            pruneSelection(for: .folder, to: live)
             pruneSelection(for: .trash, to: trashed)
             normalizeFilter()
         } catch {
@@ -438,16 +406,17 @@ final class PhotoStore {
     }
 
     private func selectionKey(for workspace: WorkspaceMode) -> String {
-        switch workspace {
-        case .sandbox: "sandbox:\(folder.directory.path)"
-        case .trash: "trash:\(folder.directory.path)"
+        let path = directory?.path ?? ""
+        return switch workspace {
+        case .folder: "folder:\(path)"
+        case .trash: "trash:\(path)"
         case .cameraRoll: "cameraRoll"
         }
     }
 
     private func setSelection(_ ids: Set<Photo.ID>, for workspace: WorkspaceMode) {
         // A fresh selection means the user moved on; undoing would overwrite it.
-        if workspace == .sandbox, !ids.isEmpty {
+        if workspace == .folder, !ids.isEmpty {
             lastDeletion = nil
         }
         selections[selectionKey(for: workspace)] = ids.isEmpty ? nil : ids
@@ -467,7 +436,7 @@ final class PhotoStore {
     }
 
     private func normalizeFilter() {
-        guard mode == .sandbox || mode == .cameraRoll, !isFilterEnabled(filter) else { return }
+        guard mode == .folder || mode == .cameraRoll, !isFilterEnabled(filter) else { return }
         filter = .all
     }
 }

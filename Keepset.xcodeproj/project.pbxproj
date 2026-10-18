@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0236870031A0A59CBBEB3A82 /* photos in Resources */ = {isa = PBXBuildFile; fileRef = FD42635FA44A4C8F6F5539DC /* photos */; };
 		2D0B757D2B1B5FD4665D0599 /* GridGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86E9F8DA6C1FAA5551849910 /* GridGeometryTests.swift */; };
 		2D91614BE3AE5DA876F19E59 /* PreviewOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA98FA0FAD81AE8D502CBA78 /* PreviewOverlay.swift */; };
 		386418C80303A6C00D9FCBCB /* CameraRollLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C0EAF3025D510DBA729676A /* CameraRollLibrary.swift */; };
@@ -74,7 +73,6 @@
 		F49646E22F0695868DF61124 /* FolderPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderPanel.swift; sourceTree = "<group>"; };
 		F82D2F6A30A24F4F1F0868F2 /* SelectionFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionFile.swift; sourceTree = "<group>"; };
 		FD1976260F852991A8990722 /* ThumbnailLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbnailLoader.swift; sourceTree = "<group>"; };
-		FD42635FA44A4C8F6F5539DC /* photos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = photos; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -130,7 +128,6 @@
 		424E0743F0EFE1D2E22A4954 = {
 			isa = PBXGroup;
 			children = (
-				FD42635FA44A4C8F6F5539DC /* photos */,
 				214C3B30265EAF7EEAA2C600 /* Keepset */,
 				2D82B78953187FBECE6A67B0 /* KeepsetTests */,
 				392C48F744BBC77923F0524E /* Products */,
@@ -213,7 +210,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				689A6EF7A5D158E38C7495D6 /* Assets.xcassets in Resources */,
-				0236870031A0A59CBBEB3A82 /* photos in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

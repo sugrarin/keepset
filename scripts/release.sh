@@ -9,8 +9,6 @@ APP="$BUILD/Build/Products/Release/Keepset.app"
 xcodebuild -project Keepset.xcodeproj -scheme Keepset -configuration Release \
     -derivedDataPath "$BUILD" build
 
-# Demo photos are for development only; the public build starts with an empty sandbox.
-rm -rf "$APP/Contents/Resources/photos"
 codesign --force --sign - --options runtime --entitlements Keepset/Keepset.entitlements "$APP"
 codesign --verify --deep --strict "$APP"
 

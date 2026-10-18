@@ -7,7 +7,7 @@ A small macOS app for culling photos. Instead of picking what to delete, you mar
 - Mark the shots you want with a click, or drag across a range
 - Keep N / Delete N shows the outcome before you commit, and the All / Keep / Delete tabs let you review each group
 - Undo right after deleting: the bar shows "Deleted N" with an Undo button, also on ⌘Z
-- Sandbox folder with a built-in Trash: Restore single photos or Empty Trash
+- Any folder on your Mac, with a built-in Trash: Restore single photos or Empty Trash
 - Camera Roll mode: unmarked photos go to Recently Deleted in Photos
 - Square or original-shape tiles, grid from 3 to 10 columns
 - Marks are remembered between launches, separately for each folder
@@ -31,13 +31,7 @@ xattr -dr com.apple.quarantine /Applications/Keepset.app
 
 ## Usage
 
-Keepset works with two sources: the Camera Roll and a photo folder. Pick the folder with **Choose Folder…** (⌘O, also in the folder menu in the top bar and on the empty screen). Keepset remembers it between launches; **Sandbox → Use Default Folder** goes back to `~/Library/Application Support/Keepset/photos`, which is where a fresh install starts (Sandbox → Show Photos Folder opens the current folder).
-
-To launch on a specific folder from the command line, set `KEEPSET_PHOTOS_DIR`. It takes priority over the remembered choice:
-
-```bash
-open -n --env KEEPSET_PHOTOS_DIR=$HOME/Pictures/shoot /Applications/Keepset.app
-```
+Keepset works with two sources: the Camera Roll and a photo folder. On first launch pick the folder with **Choose Folder…** (⌘O, also in the folder menu in the top bar and on the empty screen). Keepset remembers it between launches. Show Folder in Finder is in the Folder menu.
 
 Deleting in a folder moves files to a `.Trash` folder inside it, never to the system Trash.
 
