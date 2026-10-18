@@ -28,6 +28,13 @@ enum TileShape: String {
     case original
 }
 
+struct Deletion {
+    let trashed: [Photo]
+    let kept: Set<Photo.ID>
+
+    var count: Int { trashed.count }
+}
+
 @MainActor
 @Observable
 final class PhotoStore {
@@ -41,6 +48,7 @@ final class PhotoStore {
     var isBusy = false
     var errorMessage: String?
     var isDragSelecting = false
+    private(set) var lastDeletion: Deletion?
     var tileShape: TileShape {
         didSet { defaults.set(tileShape.rawValue, forKey: Self.tileShapeKey) }
     }
@@ -237,6 +245,7 @@ final class PhotoStore {
         let workspace = mode
         let keptIDs = selectedIDs
         let toDelete = workingPhotos.filter { !keptIDs.contains($0.id) }
+        let trashedBefore = Set(trashedPhotos.map(\.id))
         isBusy = true
         defer { isBusy = false }
         do {
@@ -263,7 +272,25 @@ final class PhotoStore {
         }
         if workspace == .sandbox {
             await reloadFolder()
+            let moved = trashedPhotos.filter { !trashedBefore.contains($0.id) }
+            lastDeletion = moved.isEmpty ? nil : Deletion(trashed: moved, kept: keptIDs)
         }
+        saveSelections()
+    }
+
+    func undoDelete() async {
+        guard let deletion = lastDeletion, !isBusy else { return }
+        lastDeletion = nil
+        isBusy = true
+        defer { isBusy = false }
+        do {
+            let folder = folder
+            try await offMain { try folder.restorePhotos(deletion.trashed) }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        await reloadFolder()
+        setSelection(deletion.kept, for: .sandbox)
         saveSelections()
     }
 
@@ -298,6 +325,7 @@ final class PhotoStore {
 
     func restoreSelected() async {
         guard mode == .trash, !selectedIDs.isEmpty, !isBusy else { return }
+        lastDeletion = nil
         let toRestore = trashedPhotos.filter { selectedIDs.contains($0.id) }
         isBusy = true
         defer { isBusy = false }
@@ -314,6 +342,7 @@ final class PhotoStore {
 
     func emptyTrash() async {
         guard mode == .trash, !isBusy else { return }
+        lastDeletion = nil
         isBusy = true
         defer { isBusy = false }
         do {
@@ -329,6 +358,7 @@ final class PhotoStore {
 
     func resetSandbox() async {
         guard !isBusy else { return }
+        lastDeletion = nil
         isBusy = true
         defer { isBusy = false }
         do {
@@ -384,6 +414,10 @@ final class PhotoStore {
     }
 
     private func setSelection(_ ids: Set<Photo.ID>, for workspace: WorkspaceMode) {
+        // A fresh selection means the user moved on; undoing would overwrite it.
+        if workspace == .sandbox, !ids.isEmpty {
+            lastDeletion = nil
+        }
         selections[selectionKey(for: workspace)] = ids.isEmpty ? nil : ids
     }
 

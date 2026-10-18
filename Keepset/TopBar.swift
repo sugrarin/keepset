@@ -84,6 +84,15 @@ struct TopBar: View {
             }
             .disabled(store.isBusy)
             .allowsHitTesting(!store.isBusy)
+        } else if store.mode == .sandbox, let deletion = store.lastDeletion {
+            Text("Deleted \(deletion.count)")
+                .monospacedDigit()
+                .foregroundStyle(.white.opacity(0.7))
+            chromeButton("Undo", fill: Theme.accent, foreground: Theme.onAccent, emphasized: true) {
+                Task { await store.undoDelete() }
+            }
+            .disabled(store.isBusy)
+            .allowsHitTesting(!store.isBusy)
         }
     }
 
