@@ -5,3 +5,4 @@ build/
 .swiftpm/
 *.xcuserstate
 photos/.Trash/
+release/

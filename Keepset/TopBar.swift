@@ -167,7 +167,7 @@ private struct GridSizeSlider: View {
                 .fill(.white.opacity(0.2))
                 .frame(height: 2)
             BarControl.innerShape
-                .fill(Theme.canvas)
+                .fill(Theme.accent)
                 .frame(width: thumbWidth)
                 .padding(.vertical, BarControl.inset)
                 .offset(x: fraction * (trackWidth - thumbWidth))
